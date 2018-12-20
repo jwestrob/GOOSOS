@@ -172,6 +172,11 @@ def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
 def write_recs(recs_for_hmm, hmm_name, outdir):
     fasta_outdir = outdir + '/fastas'
 
+    flatten = lambda l: [item for sublist in l for item in sublist]
+    recs_for_hmm = flatten(recs_for_hmm)
+
+    recs_for_hmm = list(filter(lambda x: x is not None, recs_for_hmm))
+
     print("Writing recs for " + hmm_name)
     SeqIO.write(recs_for_hmm, fasta_outdir + '/' + hmm_name + '_hits.faa', 'fasta')
     return
