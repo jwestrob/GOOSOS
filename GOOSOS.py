@@ -244,10 +244,11 @@ def main():
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
+        recs_list_by_hmm_windex = dict(zip(recs_list_by_hmm, range(recs_list_by_hmm)))
         hmms_written = list(p.map(lambda hits:
                                         write_recs(hits,
                                         #Name of HMM to write (for fasta name)
-                                        hmmlist[recs_list_by_hmm.index(hits)],
+                                        hmmlist[recs_list_by_hmm_windex[hits]],
                                         outdir),
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
