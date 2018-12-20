@@ -67,8 +67,7 @@ def extract_hits_by_outfile(dir, infile):
             return
 
 def get_recs_for_fasta(hmm, fastadir):
-    print(fastadir)
-    sys.exit()
+
     #Get name of FASTA so we can append that to the seqs for later identification
     fasta_id = fastadir.split('/')[-1]
 
@@ -101,8 +100,7 @@ def get_recs_for_fasta(hmm, fastadir):
 def extract_hits_by_hmm(hmm, fastalist, outdir, threads):
 
     p2 = Pool(threads)
-    print(fastalist[0:5])
-    sys.exit()
+
     recs = list(map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname), fastalist))
 
     return recs
@@ -228,7 +226,7 @@ def main():
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
 
-    recs_list_by_hmm = extract_hits(fastalist, hmmlist, outdir, threads)
+    recs_list_by_hmm = extract_hits(hmmlist, fastalist, outdir, threads)
 
     make_hitstable_df(recs_list_by_hmm, fastalist, hmmlist, outdir)
 
