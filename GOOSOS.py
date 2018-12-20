@@ -98,7 +98,7 @@ def get_recs_for_fasta(hmm, fastadir):
 
 
 def extract_hits_by_hmm(hmm, fastalist, outdir, threads):
-
+    print("Extracting hits for " + hmm)
     p2 = Pool(threads)
 
     recs = list(map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname), fastalist))
@@ -134,6 +134,13 @@ def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
     # Make matrix of zeros to store hits
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
+
+    print("Len(hits_by_hmm):")
+    print(len(hits_by_hmm))
+
+    print("len(hmmlist): ", len(hmmlist))
+
+    
 
     # Mark hits in table
     for hmm_idx, hmm in enumerate(hits_by_hmm):
