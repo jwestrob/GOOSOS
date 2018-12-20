@@ -140,7 +140,7 @@ def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
 
     print("len(hmmlist): ", len(hmmlist))
 
-    
+
 
     # Mark hits in table
     for hmm_idx, hmm in enumerate(hits_by_hmm):
@@ -235,7 +235,7 @@ def main():
 
     recs_list_by_hmm = extract_hits(hmmlist, fastalist, outdir, threads)
 
-    make_hitstable_df(recs_list_by_hmm, fastalist, hmmlist, outdir)
+    make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir)
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
