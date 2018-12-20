@@ -12,7 +12,7 @@ import argparse
 parser = argparse.ArgumentParser(
     description='Given a directory of protein fasta files, extract the best hit for each HMM for each bin; get multifasta of each protein')
 parser.add_argument('-fastadir', metavar='[PROTEIN FASTA DIRECTORY]',
-                    help="Directory of protein fasta files to scan for ribosomal proteins")
+                    help="Directory of protein fasta files to scan for ribosomal proteins. MUST END IN .faa EXTENSION")
 parser.add_argument('-hmmdir', metavar='[HMM DIRECTORY]', help="Directory containing HMM files to scan with")
 parser.add_argument('-outdir', metavar='[Output Directory]', default='output', help="Directory to store output files")
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
@@ -93,23 +93,107 @@ def get_recs_for_hits(hits_ids, hmm, fastadict, fastalist_wpath, fastalist, outd
     SeqIO.write(hit_recs, outdir + '/fastas/' + hmm + '.faa', 'fasta')
     return hmm
 
-def get_hits_by_hmm(hmm, fastalist, outdir):
+def get_recs_for_fasta(hmm, fastadir):
+    #Get name of FASTA so we can append that to the seqs for later identification
+    fasta_id = fastadir.split('/')[-1]
 
-    #Make list of recs for this hmm (value to return)
-    hmm_recs = []
+    #There should only be one outfile matching the hmm provided
+    hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
 
-    def get_hmm_by_fasta(fastaname, hmm):
-        #Name of directory to find outfile/fasta in
-        fastadir = outdir + '/' + fastaname
+    with open(fastadir + '/' + hmmfile, 'r') as handle:
+        for record in SearchIO.parse(handle, 'hmmer3-text'):
+            hits.append(list(record))
 
-        #Get filename of relevant outfile
-        hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
+    try:
+        hits = hits[0]
+    except:
+        return
+
+    good_hits = [hit._id for hit in hits]
+
+    out_recs = []
+
+    fastafile = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))[0]
+    fastafile = os.path.join(fastadir, fastafile)
+    for rec in SeqIO.parse(fastafile, 'fasta'):
+        if rec.id in good_hits:
+            rec.id = fasta_id + '|' + rec.id
+            out_recs.append(rec)
+
+    return out_recs
 
 
+def extract_hits_by_hmm(hmm, fastalist, outdir):
+
+    p2 = Pool(threads)
+
+    recs = list(map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname), fastalist))
+
+    return recs
+
+def extract_hits(hmmlist, fastalist, outdir, threads):
+    #List of recs (value to return)
+    recs_by_hmm = []
+
+    #I could use a map, but like... why
+    for hmm in hmmlist:
+        recs_by_hmm.append(extract_hits_by_hmm(hmm, fastalist, outdir, threads))
+
+    return recs_by_hmm
+
+def get_fastaheader_id(fasta):
+    #Is this function necessary???
+    for rec in SeqIO.parse(fasta, 'fasta'):
+        if '.peg' in rec.id:
+            id = rec.id.split('.peg')[0]
+        #Everything with '.peg' will start with 'fig|', so this structure is necessary.
+        #I usually just append the genome ID to the start of each header with a | delimiter before running.
+        elif '|' in rec.id:
+            id = rec.id.split('|')[0]
+        else:
+            print('Unrecognized header found. Aborting.')
+            sys.exit()
+        break
+    return id
+
+def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
+    # Make matrix of zeros to store hits
+    print("Making hits matrix...")
+    hitstable = np.zeros((len(hmmlist), len(fastalist)))
+
+    # Mark hits in table
+    for hmm_idx, hmm in enumerate(hits_by_hmm):
+        for genome_idx, genome_hits in enumerate(hmm):
+            if type(genome_hits) is list:
+                hits = len(genome_hits)
+            #Used to make it a string if there was only one hit;
+            #Not like that now but this doesn't hurt anything (all should be list)
+            elif type(genome_hits) is str:
+                hits = 1
+            if genome_hits is None:
+                hitstable[hmm_idx][genome_idx] = 0
+            else:
+                hitstable[hmm_idx][genome_idx] = hits
 
 
+    hits = pd.DataFrame(hitstable).T
+    hits.columns = hmmlist
+    hits['id'] = fastalist
 
+    #Get columns of DF
+    cols = list(hits.columns.values)
+    #Move IDs column to first index, for to make it look pretty
+    cols.pop(cols.index('id'))
+    hits = hits[['id'] + cols]
+    #Write it to tsv in outdir without index (annoying)
+    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
 
+def write_recs(recs_for_hmm, hmm_name, outdir):
+    fasta_outdir = outdir + '/fastas'
+
+    print("Writing recs for " + hmm_name)
+    SeqIO.write(recs_for_hmm, fasta_outdir + '/' + hmm_name + '_hits.faa', 'fasta')
+    return
 
 def main():
     args = parser.parse_args()
@@ -144,23 +228,6 @@ def main():
 
     hmm_outfiles = []
 
-    def get_fastaheader_id(fasta):
-        for rec in SeqIO.parse(fasta, 'fasta'):
-            if '.peg' in rec.id:
-                id = rec.id.split('.peg')[0]
-            #Everything with '.peg' will start with 'fig|', so this structure is necessary.
-            #I usually just append the genome ID to the start of each header with a | delimiter before running.
-            elif '|' in rec.id:
-                id = rec.id.split('|')[0]
-            else:
-                print('Unrecognized header found. Aborting.')
-                sys.exit()
-            break
-        return id
-
-    #Get list of fasta header IDs by mapping to get_fastaheader_id fn
-    fasta_header_ids = list(map(get_fastaheader_id, fastalist_wpath))
-
     #Make fasta dictionary (hopefully deprecated, let's see; dec 18 3:58 mountain time)
     fastadict = dict(zip(fasta_header_ids, fastalist))
 
@@ -187,64 +254,25 @@ def main():
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
-    # Make matrix of zeros to store hits
 
-    hits_by_hmm = []
-    #Declare function to get hits for each HMM
-    def extract_all_hits(fastaname, hmm):
-        fastadir = outdir + '/' + fastaname
-        #Get name of appropriate hmmfile, path
-        hmmhits_for_fasta = list(filter(lambda x: hmm in x, os.listdir(fastadir)))
-        hits = extract_hits_by_outfile(fastadir, hmmhits_for_fasta)
-        return hits
+    recs_list_by_hmm = extract_hits(fastalist, hmmlist, outdir, threads)
 
-    for hmm in hmmlist:
-        print("Extracting hits for: ", hmm)
-        relevant_outfiles = []
-        hits_by_hmm.append([list(p.map(lambda fastaname:
-                                        extract_all_hits(fastaname, hmm),
-                                        fastalist)), hmm])
-
-
-    print("Making hits matrix...")
-    hitstable = np.zeros((len(hmmlist), len(fastalist)))
-
-    # Mark hits in table
-    for hmm_idx, hmm in enumerate(hits_by_hmm):
-        for genome_idx, genome_hits in enumerate(hmm[0]):
-            if type(genome_hits) is list:
-                hits = len(genome_hits)
-            elif type(genome_hits) is str:
-                hits = 1
-            if genome_hits is None:
-                hitstable[hmm_idx][genome_idx] = 0
-            else:
-                hitstable[hmm_idx][genome_idx] = hits
-
-
-    hits = pd.DataFrame(hitstable).T
-    hits.columns = hmmlist
-    hits['id'] = fastalist
-
-    cols = list(hits.columns.values)
-    cols.pop(cols.index('id'))
-    hits = hits[['id'] + cols]
-    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
+    make_hitstable_df(recs_list_by_hmm, fastalist, hmmlist, outdir)
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
         hmms_written = list(p.map(lambda hits:
-                   get_recs_for_hits(hits[0], hits[1], fastadict, fastalist_wpath, fastalist,
-                                     outdir),
-                   hits_by_hmm))
+                                        write_recs(hits,
+                                        #Name of HMM to write (for fasta name)
+                                        hmmlist[recs_list_by_hmm.index(hits)],
+                                        outdir),
+                                        #List of recs to iterate over
+                                        recs_list_by_hmm))
         for hmm in hmmlist:
             if hmm not in hmms_written:
+                print("Something went wrong. Hits weren't written for this HMM, please check:")
                 print(hmm)
-        sys.exit()
 
-
-
-    # recs_by_hmm = list(map(lambda hits: get_recs_for_hits(hits), hits_by_hmm))
     print('boogie')
 
 
