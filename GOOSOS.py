@@ -66,33 +66,6 @@ def extract_hits_by_outfile(dir, infile):
         except:
             return
 
-
-def get_recs_for_hits(hits_ids, hmm, fastadict, fastalist_wpath, fastalist, outdir):
-    print("Hits IDs:")
-    print(hits_ids)
-
-    print('hmm:')
-    print(hmm)
-
-    sys.exit()
-    hit_recs = []
-    for hit in hits_ids:
-        if hit is None:
-            continue
-        else:
-            # print(hit)
-            if '.peg' in hit:
-                genome = fastadict[hit.split('.peg')[0]]
-            else:
-                genome = fastadict[hit.split('|')[0]]
-            recs = list(SeqIO.parse(fastalist_wpath[fastalist.index(genome)], 'fasta'))
-            hit_rec = list(filter(lambda x: x.id == hit, recs))[0]
-            hit_rec.id = genome + '|' + hit
-            hit_recs.append(hit_rec)
-    print("Writing hits for: ", hmm)
-    SeqIO.write(hit_recs, outdir + '/fastas/' + hmm + '.faa', 'fasta')
-    return hmm
-
 def get_recs_for_fasta(hmm, fastadir):
     #Get name of FASTA so we can append that to the seqs for later identification
     fasta_id = fastadir.split('/')[-1]
@@ -227,9 +200,6 @@ def main():
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
     hmm_outfiles = []
-
-    #Make fasta dictionary (hopefully deprecated, let's see; dec 18 3:58 mountain time)
-    fastadict = dict(zip(fasta_header_ids, fastalist))
 
     # For each fasta, run all hmms
     if not already_scanned:
