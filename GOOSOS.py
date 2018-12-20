@@ -73,7 +73,7 @@ def get_recs_for_fasta(hmm, fastadir):
 
     #There should only be one outfile matching the hmm provided
     hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
-
+    hits = []
     with open(fastadir + '/' + hmmfile, 'r') as handle:
         for record in SearchIO.parse(handle, 'hmmer3-text'):
             hits.append(list(record))
