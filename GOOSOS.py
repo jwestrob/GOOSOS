@@ -96,7 +96,7 @@ def get_recs_for_fasta(hmm, fastadir):
     return out_recs
 
 
-def extract_hits_by_hmm(hmm, fastalist, outdir):
+def extract_hits_by_hmm(hmm, fastalist, outdir, threads):
 
     p2 = Pool(threads)
 
