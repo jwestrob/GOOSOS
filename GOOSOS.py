@@ -101,7 +101,8 @@ def get_recs_for_fasta(hmm, fastadir):
 def extract_hits_by_hmm(hmm, fastalist, outdir, threads):
 
     p2 = Pool(threads)
-
+    print(fastalist[0:5])
+    sys.exit()
     recs = list(map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname), fastalist))
 
     return recs
