@@ -67,6 +67,8 @@ def extract_hits_by_outfile(dir, infile):
             return
 
 def get_recs_for_fasta(hmm, fastadir):
+    print(fastadir)
+    sys.exit()
     #Get name of FASTA so we can append that to the seqs for later identification
     fasta_id = fastadir.split('/')[-1]
 
