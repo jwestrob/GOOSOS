@@ -251,10 +251,6 @@ def main():
                                         outdir),
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
-        for hmm in hmmlist:
-            if hmm not in hmms_written:
-                print("Something went wrong. Hits weren't written for this HMM, please check:")
-                print(hmm)
 
     print('boogie')
 
