@@ -31,6 +31,19 @@ So glad to see the enthusiasm. Here's a list. I know you love those.
 
 This list will be updated iteratively as I put more stuff in here.
 
+# What are the dependencies?
+
+Well, python obviously. I recommend using pip to install all this (which can be itself used through Anaconda/Miniconda).
+
+The packages you will need to install (using a variant of the command 'pip install [PACKAGE]') are:
+
+- pathos (Enables multithreading)
+- Biopython
+- Pandas
+- Argparse
+
+Everything else should come standard with your install of python.
+
 # Wow! Cool! I want to use this in my paper!
 
 Sick yo, but please cite this repository. I'll be putting the GPL license on it in a little bit once I actually get the thing running.
