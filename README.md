@@ -23,7 +23,11 @@ So glad to see the enthusiasm. Here's a list. I know you love those.
 
 - Evalue thresholds (-evalue): This is the default evalue cutoff for HMMsearch. I recommend something like 1e-10 or lower. (HMMsearch accepts scientific notation, so type it out like that. If you hate conformity I guess you can type out 0.0000000001)
 
-- Extract Best Hit (-best_only) [DEFAULT] : Pulls out the most relevant hit (i.e., the hit with the lowest e-value) per HMM per genome. That is, if a genome has two hits for a particular HMM, it takes the hit with the lower evalue.
+- Extract Best Hit (-best) [DEFAULT] : Pulls out the most relevant hit (i.e., the hit with the lowest e-value) per HMM per genome. That is, if a genome has two hits for a particular HMM, it takes the hit with the lower evalue.
+
+- If you already scanned with HMMsearch (-already_scanned) : Don't scan again! Skip to the next part, using the same output directory.
+
+- If you don't want to write seqs and only want a hits table (-no_seqs) : Saves time if you're trying to calibrate your e-value threshold.
 
 This list will be updated iteratively as I put more stuff in here.
 

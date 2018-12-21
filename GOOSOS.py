@@ -21,6 +21,7 @@ parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1, help="Number of threads to use")
 parser.add_argument('-already_scanned', default=False, action='store_true', help='For if you already ran the HMMs')
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
+parser.add_argument('-best', default=False, action='store_true', help='Only pull out best hit per genome')
 
 def run_hmmsearch(protfile, hmmfile, wd, threshold):
     protein_id = protfile.split('/')[-1].split('.faa')[0]
@@ -85,6 +86,10 @@ def get_recs_for_fasta(hmm, fastadir):
 
     good_hits = [hit._id for hit in hits]
 
+    #If specified, take the best e-value only
+    if args.best and len(good_hits) > 1:
+        good_hits = good_hits[e_values.index(min(e_values))]
+
     out_recs = []
 
     fastafile = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))[0]
@@ -114,21 +119,6 @@ def extract_hits(hmmlist, fastalist, outdir, threads):
         recs_by_hmm.append([extract_hits_by_hmm(hmm, fastalist, outdir, threads), hmm])
 
     return recs_by_hmm
-
-def get_fastaheader_id(fasta):
-    #Is this function necessary???
-    for rec in SeqIO.parse(fasta, 'fasta'):
-        if '.peg' in rec.id:
-            id = rec.id.split('.peg')[0]
-        #Everything with '.peg' will start with 'fig|', so this structure is necessary.
-        #I usually just append the genome ID to the start of each header with a | delimiter before running.
-        elif '|' in rec.id:
-            id = rec.id.split('|')[0]
-        else:
-            print('Unrecognized header found. Aborting.')
-            sys.exit()
-        break
-    return id
 
 def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
     #Because the second element of hits_by_hmm is the hmm itself
