@@ -111,7 +111,7 @@ def extract_hits(hmmlist, fastalist, outdir, threads):
 
     #I could use a map, but like... why
     for hmm in hmmlist:
-        recs_by_hmm.append(extract_hits_by_hmm(hmm, fastalist, outdir, threads))
+        recs_by_hmm.append([extract_hits_by_hmm(hmm, fastalist, outdir, threads), hmm])
 
     return recs_by_hmm
 
@@ -131,16 +131,12 @@ def get_fastaheader_id(fasta):
     return id
 
 def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
+    #Because the second element of hits_by_hmm is the hmm itself
+    hits_by_hmm = hits_by_hmm[0]
+
     # Make matrix of zeros to store hits
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
-
-    print("Len(hits_by_hmm):")
-    print(len(hits_by_hmm))
-
-    print("len(hmmlist): ", len(hmmlist))
-
-
 
     # Mark hits in table
     for hmm_idx, hmm in enumerate(hits_by_hmm):
@@ -244,11 +240,14 @@ def main():
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
-        recs_list_by_hmm_windex = dict(zip(recs_list_by_hmm, range(len(recs_list_by_hmm))))
+
+        #HOW TO GET HMM NAME FOR CORRESPONDING THING????
         hmms_written = list(p.map(lambda hits:
-                                        write_recs(hits,
+                                        write_recs(
+                                        #Actual list of recs
+                                        hits[0],
                                         #Name of HMM to write (for fasta name)
-                                        hmmlist[recs_list_by_hmm_windex[hits]],
+                                        hits[1],
                                         outdir),
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
