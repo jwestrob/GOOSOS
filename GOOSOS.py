@@ -212,7 +212,7 @@ def main():
             hmm_outfiles.append([])
 
             # Run all HMMs for fastafile
-            hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold), \
+            hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold, best), \
                                           hmmlist_wpath))
 
             # Move all outfiles to corresponding output directory
