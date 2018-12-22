@@ -116,8 +116,8 @@ def extract_hits(hmmlist, fastalist, outdir, threads, best):
 
     return recs_by_hmm
 
-def make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir):
-    
+def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
+
     # Make matrix of zeros to store hits
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
