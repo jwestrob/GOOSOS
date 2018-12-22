@@ -16,8 +16,7 @@ parser.add_argument('-fastadir', metavar='[PROTEIN FASTA DIRECTORY]',
 parser.add_argument('-hmmdir', metavar='[HMM DIRECTORY]', help="Directory containing HMM files to scan with")
 parser.add_argument('-outdir', metavar='[Output Directory]', default='output', help="Directory to store output files")
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
-        help="Evalue threshold for HMMsearch. Default: 0.01. (I pick the hit with the best e-value; \
-        wait until alignment stage to curate)")
+        help="Evalue threshold for HMMsearch. Default: 0.01.")
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1, help="Number of threads to use")
 parser.add_argument('-already_scanned', default=False, action='store_true', help='For if you already ran the HMMs')
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
@@ -26,21 +25,18 @@ parser.add_argument('-best', default=False, action='store_true', help='Only pull
 def run_hmmsearch(protfile, hmmfile, wd, threshold):
     protein_id = protfile.split('/')[-1].split('.faa')[0]
 
-    print('------------------------------------------------------------')
-    print("Beginning HMMsearch...")
-    print(protein_id, hmmfile)
+    #print(protein_id, hmmfile)
     cmd = 'hmmsearch -o ' + wd + '/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
           '_hmmsearch.out  --notextw -E ' + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + \
           ' ' + protfile
-    print(cmd)
+    #print(cmd)
     result = subprocess.getstatusoutput(cmd)
     if result[0] != 0:
         print('HMMsearch error (check for empty sequences in your protein FASTAs)')
         print('protein_id: ', protein_id)
         print('hmmfile: ', hmmfile)
         sys.exit()
-    print(result)
-    print('------------------------------------------------------------')
+    #print(result)
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
 
@@ -202,6 +198,9 @@ def main():
 
     # For each fasta, run all hmms
     if not already_scanned:
+
+        print("Beginning HMMsearch...")
+
         for fastafile in fastalist_wpath:
             fastaoutdir = outdir + '/' + fastafile.split('/')[-1].split('.faa')[0]
             # Make outdir for HMMs
