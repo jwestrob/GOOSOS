@@ -124,17 +124,13 @@ def make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir):
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
 
-    hits = pd.DataFrame(hitstable).T
-    hits.columns = hmmlist
-    hits['id'] = fastalist
-    #Get columns of DF
-    cols = list(hits.columns.values)
-    #Move IDs column to first index, for to make it look pretty
-    cols.pop(cols.index('id'))
-    hits = hits[['id'] + cols]
+
 
     # Mark hits in table
     for hmm_recs, hmm in recs_by_hmm:
+
+        hmm_idx = hmmlist.index(hmm)
+
         for genome_idx, genome_hits in enumerate(hmm_recs):
             if type(genome_hits) is list:
                 hits = len(genome_hits)
@@ -143,10 +139,18 @@ def make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir):
             elif type(genome_hits) is str:
                 hits = 1
             if genome_hits is None:
-                hitstable[hmm][genome_idx] = 0
+                hitstable[hmm_idx][genome_idx] = 0
             else:
-                hitstable[hmm][genome_idx] = hits
+                hitstable[hmm_idx][genome_idx] = hits
 
+    hits = pd.DataFrame(hitstable).T
+    hits.columns = hmmlist
+    hits['id'] = fastalist
+    #Get columns of DF
+    cols = list(hits.columns.values)
+    #Move IDs column to first index, for to make it look pretty
+    cols.pop(cols.index('id'))
+    hits = hits[['id'] + cols]
     #Write it to tsv in outdir without index (annoying)
     hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
 
