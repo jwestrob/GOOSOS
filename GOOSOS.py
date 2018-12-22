@@ -98,21 +98,21 @@ def get_recs_for_fasta(hmm, fastadir, best):
     return out_recs
 
 
-def extract_hits_by_hmm(hmm, fastalist, outdir, threads):
+def extract_hits_by_hmm(hmm, fastalist, outdir, threads, best):
     print("Extracting hits for " + hmm)
     p2 = Pool(threads)
 
-    recs = list(p2.map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname), fastalist))
+    recs = list(p2.map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname, best), fastalist))
 
     return recs
 
-def extract_hits(hmmlist, fastalist, outdir, threads):
+def extract_hits(hmmlist, fastalist, outdir, threads, best):
     #List of recs (value to return)
     recs_by_hmm = []
 
     #I could use a map, but like... why
     for hmm in hmmlist:
-        recs_by_hmm.append([extract_hits_by_hmm(hmm, fastalist, outdir, threads), hmm])
+        recs_by_hmm.append([extract_hits_by_hmm(hmm, fastalist, outdir, threads, best), hmm])
 
     return recs_by_hmm
 
@@ -212,7 +212,7 @@ def main():
             hmm_outfiles.append([])
 
             # Run all HMMs for fastafile
-            hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold, best), \
+            hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold), \
                                           hmmlist_wpath))
 
             # Move all outfiles to corresponding output directory
@@ -224,7 +224,7 @@ def main():
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
 
-    recs_list_by_hmm = extract_hits(hmmlist, fastalist, outdir, threads)
+    recs_list_by_hmm = extract_hits(hmmlist, fastalist, outdir, threads, best)
 
     make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir)
 
