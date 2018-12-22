@@ -63,7 +63,7 @@ def extract_hits_by_outfile(dir, infile):
         except:
             return
 
-def get_recs_for_fasta(hmm, fastadir):
+def get_recs_for_fasta(hmm, fastadir, best):
 
     #Get name of FASTA so we can append that to the seqs for later identification
     fasta_id = fastadir.split('/')[-1]
@@ -83,7 +83,7 @@ def get_recs_for_fasta(hmm, fastadir):
     good_hits = [hit._id for hit in hits]
 
     #If specified, take the best e-value only
-    if args.best and len(good_hits) > 1:
+    if best and len(good_hits) > 1:
         good_hits = good_hits[e_values.index(min(e_values))]
 
     out_recs = []
@@ -172,6 +172,7 @@ def main():
     threads = int(args.threads)
     already_scanned = args.already_scanned
     no_seqs = args.no_seqs
+    best = args.best
 
     p = Pool(threads)
 
