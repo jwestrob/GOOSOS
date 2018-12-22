@@ -116,17 +116,26 @@ def extract_hits(hmmlist, fastalist, outdir, threads, best):
 
     return recs_by_hmm
 
-def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
+def make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir):
     #Because the second element of hits_by_hmm is the hmm itself
     hits_by_hmm = hits_by_hmm[0]
-
+    hmm =
     # Make matrix of zeros to store hits
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
 
+    hits = pd.DataFrame(hitstable).T
+    hits.columns = hmmlist
+    hits['id'] = fastalist
+    #Get columns of DF
+    cols = list(hits.columns.values)
+    #Move IDs column to first index, for to make it look pretty
+    cols.pop(cols.index('id'))
+    hits = hits[['id'] + cols]
+
     # Mark hits in table
-    for hmm_idx, hmm in enumerate(hits_by_hmm):
-        for genome_idx, genome_hits in enumerate(hmm):
+    for hmm_recs, hmm in recs_by_hmm:
+        for genome_idx, genome_hits in enumerate(hmm_recs):
             if type(genome_hits) is list:
                 hits = len(genome_hits)
             #Used to make it a string if there was only one hit;
@@ -134,20 +143,10 @@ def make_hitstable_df(hits_by_hmm, hmmlist, fastalist, outdir):
             elif type(genome_hits) is str:
                 hits = 1
             if genome_hits is None:
-                hitstable[hmm_idx][genome_idx] = 0
+                hitstable[hmm][genome_idx] = 0
             else:
-                hitstable[hmm_idx][genome_idx] = hits
+                hitstable[hmm][genome_idx] = hits
 
-
-    hits = pd.DataFrame(hitstable).T
-    hits.columns = hmmlist
-    hits['id'] = fastalist
-
-    #Get columns of DF
-    cols = list(hits.columns.values)
-    #Move IDs column to first index, for to make it look pretty
-    cols.pop(cols.index('id'))
-    hits = hits[['id'] + cols]
     #Write it to tsv in outdir without index (annoying)
     hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
 
