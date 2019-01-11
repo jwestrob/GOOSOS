@@ -25,6 +25,7 @@ parser.add_argument('-outdir', metavar='[Output Directory]', default='output', h
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
                     help="Evalue threshold for HMMsearch. Default: 0.01.")
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1, help="Number of threads to use")
+parser.add_argument('-already_predicted', default=False, action='store_true', help='For if you already ran Prodigal.')
 parser.add_argument('-already_scanned', default=False, action='store_true', help='For if you already ran the HMMs')
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
 parser.add_argument('-best', default=False, action='store_true', help='Only pull out best hit per genome')
@@ -46,11 +47,11 @@ def hmmpress(hmmlist_wpath, outdir):
     os.chdir(cwd)
     return
 
-def run_hmmsearch(protfile, hmmfile, wd, threshold):
+def run_hmmsearch(protfile, hmmfile, outdir, threshold):
     protein_id = protfile.split('/')[-1].split('.faa')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmsearch -o ' + wd + '/hmmsearch/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
+    cmd = 'hmmsearch -o ' + outdir + '/hmmsearch/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
           '_hmmsearch.out  --notextw -E ' + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + \
           ' ' + protfile
     #print(cmd)
@@ -63,11 +64,11 @@ def run_hmmsearch(protfile, hmmfile, wd, threshold):
     #print(result)
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
-def run_hmmscan(protfile, wd, threshold):
+def run_hmmscan(protfile, outdir, threshold):
     genome_id = protfile.split('/')[-1].split('.faa')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmscan --domtblout -o ' + wd + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
+    cmd = 'hmmscan --domtblout -o ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
     #print(cmd)
     result = subprocess.getstatusoutput(cmd)
