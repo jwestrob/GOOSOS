@@ -385,7 +385,7 @@ def test():
 
     #Make folder for proteins
     os.mkdir(outdir + '/proteins')
-    
+
     #Predict genes for nucleotide fastas
     p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
@@ -393,7 +393,11 @@ def test():
     hmmpress(hmmlist_wpath, outdir)
 
     protdir = outdir + '/proteins'
-    protlist_wpath = list(map(lambda file: os.path.join()))
+
+    protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
+
+    #Get list of protein files without full path
+    protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
 
     print("Good so far!")
     sys.exit()
