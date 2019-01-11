@@ -347,7 +347,9 @@ def prot_workflow():
     print('boogie')
     sys.exit(420)
 
-def parse_hmmdomtbl():
+def parse_hmmdomtbl(hmmoutfile):
+    goosos_dir = sys.argv[0].split('GOOSOS.py')[0]
+    
     return
 
 def test():
