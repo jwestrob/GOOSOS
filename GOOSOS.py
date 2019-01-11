@@ -59,7 +59,7 @@ def run_hmmsearch(protfile, hmmfile, outdir, threshold):
     if result[0] != 0:
         print('HMMsearch error (check for empty sequences in your protein FASTAs)')
         print('protein_id: ', protein_id)
-        print('hmmfile: ', hmmfile)
+        #print('hmmfile: ', hmmfile)
         sys.exit()
     #print(result)
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
