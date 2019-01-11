@@ -347,9 +347,12 @@ def prot_workflow():
     print('boogie')
     sys.exit(420)
 
-
+def parse_hmmdomtbl():
+    return
 
 def test():
+    print(sys.argv[0])
+    sys.exit()
     args = parser.parse_args()
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
@@ -386,46 +389,51 @@ def test():
 
     hmm_outfiles = []
 
-    if not ran_prodigal:
-        #Make folder for proteins
-        os.mkdir(outdir + '/proteins')
+    if not already_scanned:
+        if not ran_prodigal:
+            #Make folder for proteins
+            os.mkdir(outdir + '/proteins')
 
-        #Predict genes for nucleotide fastas
-        p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
+            #Predict genes for nucleotide fastas
+            p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
-        #Generate binary files for hmmsearch
-        hmmpress(hmmlist_wpath, outdir)
+            #Generate binary files for hmmsearch
+            hmmpress(hmmlist_wpath, outdir)
 
-    protdir = outdir + '/proteins'
+        protdir = outdir + '/proteins'
 
-    protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
+        protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
-    #Get list of protein files without full path
-    protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
+        #Get list of protein files without full path
+        protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
 
-    #Make directory to store hmmsearch outfiles
-    os.system('mkdir ' + outdir + '/hmmscan/')
+        #Make directory to store hmmsearch outfiles
+        os.system('mkdir ' + outdir + '/hmmscan/')
 
-    for fastafile in protlist_wpath:
+        for fastafile in protlist_wpath:
 
-        fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
-        # Make outdir for HMMs
-        if not os.path.exists(fastaoutdir):
-            os.system('mkdir ' + fastaoutdir)
-        #Make symbolic link
-        os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
-        hmm_outfiles.append([])
+            fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+            # Make outdir for HMMs
+            if not os.path.exists(fastaoutdir):
+                os.system('mkdir ' + fastaoutdir)
+            #Make symbolic link
+            os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+            hmm_outfiles.append([])
 
-        # Run all HMMs for fastafile
-        hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
+            # Run all HMMs for fastafile
+            hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
 
-        #list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
-        #                              hmmlist_wpath))
-        genome_id = hmm_outfiles[-1].split('_hmmsearch.out')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+            #list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
+            #                              hmmlist_wpath))
+            genome_id = hmm_outfiles[-1].split('_hmmsearch.out')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
 
-        print()
-        os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
-    print("Good so far!")
+            print()
+            os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
+
+    #Make directory to store fasta hits
+    if not os.path.exists(outdir + '/' + 'fastas'):
+        os.system('mkdir ' + outdir + '/' + 'fastas')
+
     sys.exit()
 
     return
