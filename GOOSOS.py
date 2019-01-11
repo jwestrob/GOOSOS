@@ -422,7 +422,8 @@ def test():
         #list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
         #                              hmmlist_wpath))
         genome_id = hmm_outfiles[-1].split('_hmmsearch.out')[0]
-        os.system('mv ' + outdir + '/' + hmm_outfiles[-1] + ' ' + outdir + '/' + genome_id + '/')
+        print()
+        os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
     print("Good so far!")
     sys.exit()
 
