@@ -63,12 +63,12 @@ def run_hmmsearch(protfile, hmmfile, wd, threshold):
     #print(result)
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
-def run_hmmscan(protfile, hmmdb, wd, threshold):
+def run_hmmscan(protfile, wd, threshold):
     genome_id = protfile.split('/')[-1].split('.faa')[0]
 
     #print(protein_id, hmmfile)
     cmd = 'hmmscan --domtblout -o ' + wd + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
-            + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + ' ' + protfile
+            + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
     #print(cmd)
     result = subprocess.getstatusoutput(cmd)
     if result[0] != 0:
@@ -417,8 +417,10 @@ def test():
         hmm_outfiles.append([])
 
         # Run all HMMs for fastafile
-        hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
-                                      hmmlist_wpath))
+        hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
+
+        #list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
+        #                              hmmlist_wpath))
 
         # Move all outfiles to corresponding output directory
         for outfile in hmm_outfiles[-1]:
