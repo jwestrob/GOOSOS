@@ -381,13 +381,21 @@ def test():
 
     hmm_outfiles = []
 
-    hmmpress()
+    #Predict genes for nucleotide fastas
+    p.map(run_prodigal, fastalist_wpath)
+
+    #Generate binary files for hmmsearch
+    hmmpress(hmmlist_wpath, outdir)
 
     print("Good so far!")
 
     return
+
+
 def main():
     args = parser.parse_args()
+
+    test()
 
     if args.nuc:
         nuc_workflow(args)
