@@ -389,6 +389,7 @@ def test():
     hmmpress(hmmlist_wpath, outdir)
 
     print("Good so far!")
+    sys.exit()
 
     return
 
