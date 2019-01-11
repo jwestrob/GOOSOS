@@ -342,6 +342,7 @@ def hmmpress(hmmlist_wpath, outdir):
     os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
+    os.system('mv ' + outdir + '/*.h3* ' + outdir + '/hmmpress/')
 
     os.chdir(cwd)
     return
