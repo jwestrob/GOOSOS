@@ -70,7 +70,7 @@ def run_hmmscan(protfile, outdir, threshold):
     #print(protein_id, hmmfile)
     cmd = 'hmmscan --domtblout -o ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
-    #print(cmd)
+    print(cmd)
     result = subprocess.getstatusoutput(cmd)
     if result[0] != 0:
         print('HMMscan error (check for empty sequences in your protein FASTAs)')
@@ -240,8 +240,8 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     return
 
 def run_prodigal(fastafile_wpath, outdir):
-    print('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
-                            fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
+    #print('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
+    #                        fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
     os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
                             fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
     print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
