@@ -29,6 +29,23 @@ parser.add_argument('-already_scanned', default=False, action='store_true', help
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
 parser.add_argument('-best', default=False, action='store_true', help='Only pull out best hit per genome')
 
+def hmmpress(hmmlist_wpath, outdir):
+    #Concatenate all hmm files together and press them into a binary
+    list_of_hmms = ' '.join(hmmlist_wpath)
+
+    #Make folder to store hmmpress files in
+    os.mkdir(outdir + '/hmmpress')
+    cwd = os.getcwd()
+
+    os.chdir(outdir)
+    os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
+
+    os.system('hmmpress concatenated_hmms.hmm')
+    os.system('mv ' + outdir + '/concatenated_hmms.* ' + outdir + '/hmmpress/')
+
+    os.chdir(cwd)
+    return
+
 def run_hmmsearch(protfile, hmmfile, wd, threshold):
     protein_id = protfile.split('/')[-1].split('.faa')[0]
 
@@ -226,7 +243,7 @@ def run_prodigal(fastafile_wpath, outdir):
                             fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
     os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
                             fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
-    print('Genes predicted for ' + fastafile_wpath)
+    print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
 
 def nuc_workflow():
     print("Nucleotide workflow not yet implemented. Don't get ahead of yourself.")
@@ -332,22 +349,7 @@ def prot_workflow():
     print('boogie')
     sys.exit(420)
 
-def hmmpress(hmmlist_wpath, outdir):
-    #Concatenate all hmm files together and press them into a binary
-    list_of_hmms = ' '.join(hmmlist_wpath)
 
-    #Make folder to store hmmpress files in
-    os.mkdir(outdir + '/hmmpress')
-    cwd = os.getcwd()
-
-    os.chdir(outdir)
-    os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
-
-    os.system('hmmpress concatenated_hmms.hmm')
-    os.system('mv ' + outdir + '/concatenated_hmms.* ' + outdir + '/hmmpress/')
-
-    os.chdir(cwd)
-    return
 
 def test():
     args = parser.parse_args()
@@ -400,6 +402,27 @@ def test():
 
     #Get list of protein files without full path
     protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
+
+    #Make directory to store hmmsearch outfiles
+    os.system('mkdir ' + outdir + '/hmmscan/')
+
+    for fastafile in protlist_wpath:
+
+        fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+        # Make outdir for HMMs
+        if not os.path.exists(fastaoutdir):
+            os.system('mkdir ' + fastaoutdir)
+        #Make symbolic link
+        os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+        hmm_outfiles.append([])
+
+        # Run all HMMs for fastafile
+        hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
+                                      hmmlist_wpath))
+
+        # Move all outfiles to corresponding output directory
+        for outfile in hmm_outfiles[-1]:
+            os.system('mv ' + outdir + '/' + outfile + ' ' + fastaoutdir)
 
     print("Good so far!")
     sys.exit()
