@@ -79,9 +79,7 @@ def run_hmmscan(protfile, outdir, threshold):
         sys.exit()
     #print(result)
     #Parse file with awk/perl nonsense; generate .parse file
-    print('PARSING HMMDOMTBL...')
     parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out')
-    print('I DID IT!')
     return genome_id + '_hmmsearch.out'
 
 def extract_hits_by_outfile(dir, infile):
@@ -356,7 +354,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     print('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
                 + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
-    os.system('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
+    status = subprocess.getstatusoutput('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
                 + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
     return
 
