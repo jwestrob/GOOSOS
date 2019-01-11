@@ -357,8 +357,6 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     return
 
 def test():
-    print(sys.argv[0])
-    sys.exit()
     args = parser.parse_args()
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
