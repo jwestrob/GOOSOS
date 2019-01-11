@@ -349,7 +349,7 @@ def hmmpress(hmmlist_wpath, outdir):
 def test():
     args = parser.parse_args()
     args = parser.parse_args()
-    fastadir = str(Path(args.fastadir).absolute())
+    nucdir = str(Path(args.nucdir).absolute())
     hmmdir = str(Path(args.hmmdir).absolute())
     outdir = str(args.outdir)
     threshold = float(args.evalue)
@@ -369,10 +369,10 @@ def test():
         outdir = str(Path(outdir).absolute())
 
     # Get list of paths of all fastas
-    fastalist_wpath = list(map(lambda file: os.path.join(fastadir, file), os.listdir(fastadir)))
+    fastalist_wpath = list(map(lambda file: os.path.join(nucdir, file), os.listdir(nucdir)))
 
     # Get list of all fastas
-    fastalist = list(map(lambda file: file.split('.faa')[0], os.listdir(fastadir)))
+    #fastalist = list(map(lambda file: file.split('.f')[0], os.listdir(fastadir)))
 
     # Get list of paths of all HMM files
     hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), os.listdir(hmmdir)))
