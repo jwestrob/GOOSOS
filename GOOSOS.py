@@ -354,9 +354,9 @@ def prot_workflow():
 def parse_hmmdomtbl(outdir, hmmoutfile):
     goosos_dir = sys.argv[0].split('GOOSOS.py')[0]
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
-    print('bash ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
+    print('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
                 + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
-    os.system('bash ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
+    os.system('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
                 + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
     return
 
