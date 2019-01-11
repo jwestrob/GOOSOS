@@ -87,7 +87,8 @@ def extract_hits_by_outfile(dir, infile):
 
 def extract_hits_by_outfile_NUC(dir, infile):
     hits = []
-    e_values =
+    print("extract_hits_by_outfile not implemented. Exiting...")
+    sys.exit()
 
 def get_recs_for_fasta(hmm, fastadir, best):
 
