@@ -39,7 +39,6 @@ def hmmpress(hmmlist_wpath, outdir):
     cwd = os.getcwd()
 
     os.chdir(outdir)
-    print('CAT ERROR???')
     os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
@@ -80,7 +79,9 @@ def run_hmmscan(protfile, outdir, threshold):
         sys.exit()
     #print(result)
     #Parse file with awk/perl nonsense; generate .parse file
+    print('PARSING HMMDOMTBL...')
     parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out')
+    print('I DID IT!')
     return genome_id + '_hmmsearch.out'
 
 def extract_hits_by_outfile(dir, infile):
