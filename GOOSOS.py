@@ -78,7 +78,7 @@ def run_hmmscan(protfile, outdir, threshold):
         #print('hmmfile: ', hmmfile)
         sys.exit()
     #print(result)
-    return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
+    return genome_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
 def extract_hits_by_outfile(dir, infile):
     hits = []
