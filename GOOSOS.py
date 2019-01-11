@@ -10,13 +10,20 @@ import subprocess
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='Given a directory of protein fasta files, extract the best hit for each HMM for each bin; get multifasta of each protein')
-parser.add_argument('-fastadir', metavar='[PROTEIN FASTA DIRECTORY]',
+    description='Given a directory of protein fasta files, extract the hits for each HMM for each bin; get multifasta of each protein')
+
+parser.add_argument('-nuc', metavar='[NUCLEOTIDE WORKFLOW]', action='store_true',
+                    default=False, help='Run GOOSOS Nucleotide workflow. Ignores -protdir')
+parser.add_argument('-prot', metavar='[PROTEIN WORKFLOW]', action='store_true',
+                    default=False, help='Run GOOSOS protein  workflow. If -nucdir is provided, includes predicted proteins from nucleotide sequences.')
+parser.add_argument('-nucdir', metavar='[NUCLEOTIDE FASTA DIRECTORY]',
+                    help='Directory containing nucleotide sequences.')
+parser.add_argument('-protdir', metavar='[PROTEIN FASTA DIRECTORY]',
                     help="Directory of protein fasta files to scan for ribosomal proteins. MUST END IN .faa EXTENSION")
 parser.add_argument('-hmmdir', metavar='[HMM DIRECTORY]', help="Directory containing HMM files to scan with")
 parser.add_argument('-outdir', metavar='[Output Directory]', default='output', help="Directory to store output files")
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
-        help="Evalue threshold for HMMsearch. Default: 0.01.")
+                    help="Evalue threshold for HMMsearch. Default: 0.01.")
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1, help="Number of threads to use")
 parser.add_argument('-already_scanned', default=False, action='store_true', help='For if you already ran the HMMs')
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
@@ -26,7 +33,7 @@ def run_hmmsearch(protfile, hmmfile, wd, threshold):
     protein_id = protfile.split('/')[-1].split('.faa')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmsearch -o ' + wd + '/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
+    cmd = 'hmmsearch -o ' + wd + '/hmmsearch/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
           '_hmmsearch.out  --notextw -E ' + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + \
           ' ' + protfile
     #print(cmd)
@@ -39,6 +46,21 @@ def run_hmmsearch(protfile, hmmfile, wd, threshold):
     #print(result)
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
+def run_hmmscan(protfile, hmmdb, wd, threshold):
+    genome_id = protfile.split('/')[-1].split('.faa')[0]
+
+    #print(protein_id, hmmfile)
+    cmd = 'hmmscan --domtblout -o ' + wd + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E '
+            + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + ' ' + protfile
+    #print(cmd)
+    result = subprocess.getstatusoutput(cmd)
+    if result[0] != 0:
+        print('HMMscan error (check for empty sequences in your protein FASTAs)')
+        print('protein_id: ', protein_id)
+        print('hmmfile: ', hmmfile)
+        sys.exit()
+    #print(result)
+    return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
 def extract_hits_by_outfile(dir, infile):
     hits = []
@@ -62,6 +84,10 @@ def extract_hits_by_outfile(dir, infile):
             return good_hits[0]
         except:
             return
+
+def extract_hits_by_outfile_NUC(dir, infile):
+    hits = []
+    e_values =
 
 def get_recs_for_fasta(hmm, fastadir, best):
 
@@ -97,6 +123,36 @@ def get_recs_for_fasta(hmm, fastadir, best):
 
     return out_recs
 
+def get_recs_for_fasta_nuc(hmm, fastadir):
+
+    #Get name of FASTA so we can append that to the seqs for later identification
+    fasta_id = fastadir.split('/')[-1]
+
+    #There should only be one outfile matching the hmm provided
+    hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
+    hits = []
+    with open(fastadir + '/' + hmmfile, 'r') as handle:
+        for record in SearchIO.parse(handle, 'hmmer3-text'):
+            hits.append(list(record))
+
+    try:
+        hits = hits[0]
+    except:
+        return
+
+    hits = [hit._id for hit in hits]
+    evalues = [hit.evalue for hit in hits]
+
+    out_recs = []
+
+    fastafile = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))[0]
+    fastafile = os.path.join(fastadir, fastafile)
+    for rec in SeqIO.parse(fastafile, 'fasta'):
+        if rec.id in good_hits:
+            rec.id = fasta_id + '|' + rec.id
+            out_recs.append(rec)
+
+    return out_recs
 
 def extract_hits_by_hmm(hmm, fastalist, outdir, threads, best):
     print("Extracting hits for " + hmm)
@@ -164,7 +220,15 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     SeqIO.write(recs_for_hmm, fasta_outdir + '/' + hmm_name + '_hits.faa', 'fasta')
     return
 
-def main():
+def run_prodigal(fastafile, outdir):
+    os.system('prodigal -i '+ fastafile + ' -a ' + outdir + '/proteins/' +
+                            fastafile + '.faa -m -p single > /dev/null 2>&1')
+    print('Genes predicted for ' + fastafile)
+
+def nuc_workflow():
+    print("Nucleotide workflow not yet implemented. Don't get ahead of yourself.")
+    sys.exit()
+
     args = parser.parse_args()
     fastadir = str(Path(args.fastadir).absolute())
     hmmdir = str(Path(args.hmmdir).absolute())
@@ -174,6 +238,20 @@ def main():
     already_scanned = args.already_scanned
     no_seqs = args.no_seqs
     best = args.best
+
+    p = Pool(threads)
+
+def prot_workflow():
+    args = parser.parse_args()
+    fastadir = str(Path(args.fastadir).absolute())
+    hmmdir = str(Path(args.hmmdir).absolute())
+    outdir = str(args.outdir)
+    threshold = float(args.evalue)
+    threads = int(args.threads)
+    already_scanned = args.already_scanned
+    no_seqs = args.no_seqs
+    best = args.best
+
 
     p = Pool(threads)
 
@@ -201,13 +279,19 @@ def main():
     # For each fasta, run all hmms
     if not already_scanned:
 
-        print("Beginning HMMsearch...")
+        print("Beginning HMMscan...")
+
+        print("Pressing HMM files to binary...")
+        hmmpress(hmmlist_wpath, outdir)
+
+        #Make directory to store hmmsearch outfiles
+        os.system('mkdir ' + outdir + '/hmmscan/')
 
         for fastafile in fastalist_wpath:
-            fastaoutdir = outdir + '/' + fastafile.split('/')[-1].split('.faa')[0]
+            fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0]
             # Make outdir for HMMs
             if not os.path.exists(fastaoutdir):
-                os.system('mkdir ' + outdir + '/' + fastafile.split('/')[-1].split('.faa')[0])
+                os.system('mkdir ' + fastaoutdir)
             #Make symbolic link
             os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
             hmm_outfiles.append([])
@@ -232,7 +316,6 @@ def main():
     if not no_seqs:
         print("Getting recs and writing to fasta...")
 
-        #HOW TO GET HMM NAME FOR CORRESPONDING THING????
         hmms_written = list(p.map(lambda hits:
                                         write_recs(
                                         #Actual list of recs
@@ -244,6 +327,75 @@ def main():
                                         recs_list_by_hmm))
 
     print('boogie')
+    sys.exit(420)
+
+def hmmpress(hmmlist_wpath, outdir):
+    #Concatenate all hmm files together and press them into a binary
+    list_of_hmms = ' '.join(hmmlist_wpath)
+
+    #Make folder to store hmmpress files in
+    os.mkdir(outdir + '/hmmpress')
+    cwd = os.getcwd()
+
+    os.chdir(outdir)
+    os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
+
+    os.system('hmmpress concatenated_hmms.hmm')
+
+    os.chdir(cwd)
+    return
+
+def test():
+    args = parser.parse_args()
+    args = parser.parse_args()
+    fastadir = str(Path(args.fastadir).absolute())
+    hmmdir = str(Path(args.hmmdir).absolute())
+    outdir = str(args.outdir)
+    threshold = float(args.evalue)
+    threads = int(args.threads)
+    already_scanned = args.already_scanned
+    no_seqs = args.no_seqs
+    best = args.best
+
+
+    p = Pool(threads)
+
+    # Make output directory
+    if not os.path.exists(outdir):
+        os.system('mkdir ' + outdir)
+        outdir = str(Path(outdir).absolute())
+    else:
+        outdir = str(Path(outdir).absolute())
+
+    # Get list of paths of all fastas
+    fastalist_wpath = list(map(lambda file: os.path.join(fastadir, file), os.listdir(fastadir)))
+
+    # Get list of all fastas
+    fastalist = list(map(lambda file: file.split('.faa')[0], os.listdir(fastadir)))
+
+    # Get list of paths of all HMM files
+    hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), os.listdir(hmmdir)))
+
+    # Get list of all HMMs
+    hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
+
+    hmm_outfiles = []
+
+    hmmpress()
+
+    print("Good so far!")
+
+    return
+def main():
+    args = parser.parse_args()
+
+    if args.nuc:
+        nuc_workflow(args)
+    elif args.prot:
+        prot_workflow(args)
+    else:
+        print("Please specify a workflow- either nucleotide or protein. Exiting...")
+        sys.exit()
 
 
 if __name__ == "__main__":
