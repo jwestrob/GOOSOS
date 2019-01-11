@@ -396,8 +396,8 @@ def test():
         #Predict genes for nucleotide fastas
         p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
-    #Generate binary files for hmmsearch
-    hmmpress(hmmlist_wpath, outdir)
+        #Generate binary files for hmmsearch
+        hmmpress(hmmlist_wpath, outdir)
 
     protdir = outdir + '/proteins'
 
