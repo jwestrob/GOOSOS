@@ -342,7 +342,7 @@ def hmmpress(hmmlist_wpath, outdir):
     os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
-    os.system('mv ' + outdir + '/*.h3* ' + outdir + '/hmmpress/')
+    os.system('mv ' + outdir + '/concatenated_hmms.* ' + outdir + '/hmmpress/')
 
     os.chdir(cwd)
     return
@@ -383,11 +383,17 @@ def test():
 
     hmm_outfiles = []
 
+    #Make folder for proteins
+    os.mkdir(outdir + '/proteins')
+    
     #Predict genes for nucleotide fastas
     p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
     #Generate binary files for hmmsearch
     hmmpress(hmmlist_wpath, outdir)
+
+    protdir = outdir + '/proteins'
+    protlist_wpath = list(map(lambda file: os.path.join()))
 
     print("Good so far!")
     sys.exit()
