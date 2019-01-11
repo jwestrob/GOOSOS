@@ -222,6 +222,8 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     return
 
 def run_prodigal(fastafile, outdir):
+    print('prodigal -i '+ fastafile + ' -a ' + outdir + '/proteins/' +
+                            fastafile + '.faa -m -p single > /dev/null 2>&1')
     os.system('prodigal -i '+ fastafile + ' -a ' + outdir + '/proteins/' +
                             fastafile + '.faa -m -p single > /dev/null 2>&1')
     print('Genes predicted for ' + fastafile)
