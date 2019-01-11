@@ -74,7 +74,7 @@ def run_hmmscan(protfile, outdir, threshold):
     result = subprocess.getstatusoutput(cmd)
     if result[0] != 0:
         print('HMMscan error (check for empty sequences in your protein FASTAs)')
-        print('protein_id: ', protein_id)
+        print('genome_id: ', genome_id)
         print('hmmfile: ', hmmfile)
         sys.exit()
     #print(result)
@@ -360,6 +360,7 @@ def test():
     outdir = str(args.outdir)
     threshold = float(args.evalue)
     threads = int(args.threads)
+    ran_prodigal = args.already_predicted
     already_scanned = args.already_scanned
     no_seqs = args.no_seqs
     best = args.best
@@ -388,11 +389,12 @@ def test():
 
     hmm_outfiles = []
 
-    #Make folder for proteins
-    os.mkdir(outdir + '/proteins')
+    if not ran_prodigal:
+        #Make folder for proteins
+        os.mkdir(outdir + '/proteins')
 
-    #Predict genes for nucleotide fastas
-    p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
+        #Predict genes for nucleotide fastas
+        p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
     #Generate binary files for hmmsearch
     hmmpress(hmmlist_wpath, outdir)
