@@ -320,10 +320,7 @@ def prot_workflow():
             # Run all HMMs for fastafile
             hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold), \
                                           hmmlist_wpath))
-
-            # Move all outfiles to corresponding output directory
-            for outfile in hmm_outfiles[-1]:
-                os.system('mv ' + outdir + '/' + outfile + ' ' + fastaoutdir)
+            
 
     # Make directory to store fastas
     if not os.path.exists(outdir + '/' + 'fastas'):
