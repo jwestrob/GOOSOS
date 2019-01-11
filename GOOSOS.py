@@ -221,11 +221,11 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     SeqIO.write(recs_for_hmm, fasta_outdir + '/' + hmm_name + '_hits.faa', 'fasta')
     return
 
-def run_prodigal(fastafile, outdir):
-    print('prodigal -i '+ fastafile + ' -a ' + outdir + '/proteins/' +
-                            fastafile + '.faa -m -p single > /dev/null 2>&1')
-    os.system('prodigal -i '+ fastafile + ' -a ' + outdir + '/proteins/' +
-                            fastafile + '.faa -m -p single > /dev/null 2>&1')
+def run_prodigal(fastafile_wpath, outdir):
+    print('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + 'proteins/' +
+                            fastafile_wpath.split('/')[0] + '.faa -m -p single > /dev/null 2>&1')
+    os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + 'proteins/' +
+                            fastafile_wpath.split('/')[0] + '.faa -m -p single > /dev/null 2>&1')
     print('Genes predicted for ' + fastafile)
 
 def nuc_workflow():
