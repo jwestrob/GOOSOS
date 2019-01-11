@@ -226,7 +226,7 @@ def run_prodigal(fastafile_wpath, outdir):
                             fastafile_wpath.split('/')[0] + '.faa -m -p single > /dev/null 2>&1')
     os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + 'proteins/' +
                             fastafile_wpath.split('/')[0] + '.faa -m -p single > /dev/null 2>&1')
-    print('Genes predicted for ' + fastafile)
+    print('Genes predicted for ' + fastafile_wpath)
 
 def nuc_workflow():
     print("Nucleotide workflow not yet implemented. Don't get ahead of yourself.")
