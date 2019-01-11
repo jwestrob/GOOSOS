@@ -39,6 +39,7 @@ def hmmpress(hmmlist_wpath, outdir):
     cwd = os.getcwd()
 
     os.chdir(outdir)
+    print('CAT ERROR???')
     os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
