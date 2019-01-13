@@ -352,10 +352,32 @@ def prot_workflow():
 def parse_hmmdomtbl(outdir, hmmoutfile):
     goosos_dir = sys.argv[0].split('GOOSOS.py')[0]
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
-    print('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
-                + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
-    subprocess.Popen(goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
-                + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', shell=True, stdout=subprocess.PIPE)
+    hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
+
+    #print('bash ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
+    c1 = "cat " + hmmoutfile_wpath
+    c2 = "grep -v '^#'"
+    c3 = "awk '{print $1,$3,$4,$6,$13,$16,$17,$18,$19}'"
+    c4 = "sed 's/ /\t/g'"
+    c5 = "sort -k 3,3 -k 8n -k 9n"
+    c6 = "perl -e 'while(<>){chomp;@a=split;next if $a[-1]==$a[-2];push(@{$b{$a[2]}},$_);}foreach(sort keys %b){@a=@{$b{$_}};for($i=0;$i<$#a;$i++){@b=split(/\t/,$a[$i]);@c=split(/\t/,$a[$i+1]);$len1=$b[-1]-$b[-2];$len2=$c[-1]-$c[-2];$len3=$b[-1]-$c[-2];if($len3>0 and ($len3/$len1>0.5 or $len3/$len2>0.5)){if($b[4]<$c[4]){splice(@a,$i+1,1);}else{splice(@a,$i,1);}$i=$i-1;}}foreach(@a){print $_."+'"\n"'+";}}'"
+    c7 = "perl -e 'while(<>){chomp;@a=split(/\t/,$_);if(($a[-1]-$a[-2])>80){print $_," + '"\t"' + ",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-5;}else{print $_,"+'"\t"'+",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-3;}}'"
+    c8 = "awk '$NF>0.3'"
+    c9 = "sort -k 3 -k 8,9g"
+    p1 = subprocess.Popen(c1, stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE)
+    p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE)
+    p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE)
+    p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE)
+    p6 = subprocess.Popen(c6, stdin=p5.stdout, stdout=subprocess.PIPE)
+    p7 = subprocess.Popen(c7, stdin=p6.stdout, stdout=subprocess.PIPE)
+    p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE)
+    p9 = subprocess.Popen(c9, stdin=p8.stdout, stdout=subprocess.PIPE)
+    print("End of piping process...")
+    print(p9.commmunicate())
+
+    print
+
     return
 
 def test():
