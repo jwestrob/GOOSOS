@@ -374,9 +374,10 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE, shell=True)
     p9 = subprocess.Popen(c9, stdin=p8.stdout, stdout=subprocess.PIPE, shell=True)
     print("End of piping process...")
-    print(p9.communicate())
+    result = list(p9.communicate())
+    print(result)
 
-    print
+    #print
 
     return
 
