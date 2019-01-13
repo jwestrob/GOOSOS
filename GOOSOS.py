@@ -354,8 +354,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     print('sh ' + goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
                 + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse')
-    subbprocess.call(goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
-                + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', shell=True)
+    subprocess.call(goosos_dir + 'hmmscan-parser.sh ' + outdir + '/hmmscan/' + genome_id + '/'
+                + hmmoutfile + ' > ' +  outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', shell=True   )
     return
 
 def test():
