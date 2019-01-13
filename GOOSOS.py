@@ -364,15 +364,15 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c7 = "perl -e 'while(<>){chomp;@a=split(/\t/,$_);if(($a[-1]-$a[-2])>80){print $_," + '"\t"' + ",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-5;}else{print $_,"+'"\t"'+",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-3;}}'"
     c8 = "awk '$NF>0.3'"
     c9 = "sort -k 3 -k 8,9g"
-    p1 = subprocess.Popen(c1, stdout=subprocess.PIPE)
-    p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE)
-    p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE)
-    p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE)
-    p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE)
-    p6 = subprocess.Popen(c6, stdin=p5.stdout, stdout=subprocess.PIPE)
-    p7 = subprocess.Popen(c7, stdin=p6.stdout, stdout=subprocess.PIPE)
-    p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE)
-    p9 = subprocess.Popen(c9, stdin=p8.stdout, stdout=subprocess.PIPE)
+    p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
+    p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
+    p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
+    p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE, shell=True)
+    p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE, shell=True))
+    p6 = subprocess.Popen(c6, stdin=p5.stdout, stdout=subprocess.PIPE, shell=True)
+    p7 = subprocess.Popen(c7, stdin=p6.stdout, stdout=subprocess.PIPE, shell=True)
+    p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE, shell=True)
+    p9 = subprocess.Popen(c9, stdin=p8.stdout, stdout=subprocess.PIPE, shell=True)
     print("End of piping process...")
     print(p9.commmunicate())
 
