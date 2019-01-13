@@ -368,7 +368,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
     p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE, shell=True)
-    p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE, shell=True))
+    p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE, shell=True)
     p6 = subprocess.Popen(c6, stdin=p5.stdout, stdout=subprocess.PIPE, shell=True)
     p7 = subprocess.Popen(c7, stdin=p6.stdout, stdout=subprocess.PIPE, shell=True)
     p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE, shell=True)
