@@ -29,6 +29,9 @@ parser.add_argument('-already_predicted', default=False, action='store_true', he
 parser.add_argument('-already_scanned', default=False, action='store_true', help='For if you already ran the HMMs')
 parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont pull out sequences to fasta')
 parser.add_argument('-best', default=False, action='store_true', help='Only pull out best hit per genome')
+parser.add_argument('-align', default=False, action='store_true', help='Align fastas once extracted')
+parser.add_argument('-accurate', default=False, action='store_true', help='If aligning, use accurate (SLOW) mafft parameters.')
+
 
 def hmmpress(hmmlist_wpath, outdir):
     #Concatenate all hmm files together and press them into a binary
@@ -315,6 +318,18 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
     return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
 
+def align(outdir, threads, fastafile_wpath, accurate):
+    fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
+    if accurate:
+        print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
+                + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
+        os.system('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
+                + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
+    else:
+        os.system('mafft --thread ' + str(threads) + ' ' + fastafile_wpath + ' > '
+                + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
+    return
+
 def test():
     args = parser.parse_args()
     args = parser.parse_args()
@@ -327,6 +342,8 @@ def test():
     already_scanned = args.already_scanned
     no_seqs = args.no_seqs
     best = args.best
+    align = args.align
+    accurate = args.accurate
 
 
     p = Pool(threads)
@@ -429,6 +446,13 @@ def test():
                                         outdir),
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
+
+        if align:
+            out_fastas = os.listdir(outdir + '/fastas')
+            out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
+            os.system('mkdir ' + outdir + '/alignments')
+            list(map(lambda x: align(outdir, threads, x, accurate)
+
 
     print("Good so far!")
 
