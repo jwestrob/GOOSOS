@@ -176,7 +176,9 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     flatten = lambda l: [item for sublist in l for item in sublist]
     recs_for_hmm = flatten(recs_for_hmm)
 
+    print("Recs for HMM:")
     print(recs_for_hmm)
+    print("HMM Name:")
     print(hmm_name)
     sys.exit()
 
