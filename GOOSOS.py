@@ -164,7 +164,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
                 print(genome_id)
                 print(type(genome_id))
 
-            hits[genome_id][hmm] += 1
+            hits[hmm][genome_id] += 1
 
 
     #Write it to tsv in outdir without index (annoying)
