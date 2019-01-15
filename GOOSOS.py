@@ -427,9 +427,6 @@ def test():
     if not no_seqs:
         print("Getting recs and writing to fasta...")
 
-        print(recs_list_by_hmm[0])
-        sys.exit()
-
         hmms_written = list(map(lambda hits:
                                         write_recs(
                                         #Actual list of recs
