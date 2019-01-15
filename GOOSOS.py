@@ -433,7 +433,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
             sorted_red = red_df.sort_values(by='evalue', ascending=True)
             goodrow = sorted_red.iloc[0]
             worse_row = sorted_red.iloc[1]
-            if goodrow.evalue > threshold:
+            if goodrow.evalue.astype(float) > threshold:
                 orflist.append([goodrow.family_hmm,
                                 goodrow.hmm_length,
                                 goodrow.query_id,
@@ -455,7 +455,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
         else:
             goodrow = red_df.iloc[0]
-            if goodrow.evalue > threshold:
+            if goodrow.evalue.astype(float) > threshold:
                 orflist.append([goodrow.family_hmm,
                                 goodrow.hmm_length,
                                 goodrow.query_id,
