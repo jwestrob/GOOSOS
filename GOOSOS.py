@@ -71,7 +71,7 @@ def run_hmmscan(protfile, outdir, threshold):
     cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
     print(cmd)
-    result = subprocess.getstatusoutput(cmd).wait()
+    result = subprocess.run(cmd, shell=True, check=True)
     if result[0] != 0:
         print('HMMscan error (check for empty sequences in your protein FASTAs)')
         print('genome_id: ', genome_id)
