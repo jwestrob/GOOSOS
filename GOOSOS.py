@@ -70,7 +70,7 @@ def run_hmmscan(protfile, outdir, threshold):
     #print(protein_id, hmmfile)
     cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
-    print(cmd)
+    #print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
         print(result)
@@ -367,7 +367,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     domtbl_header = ['target name', 'accession', 'tlen', 'query name', 'accession', 'qlen', 'E-value',
                     'full_score',  'full_bias',   'dom_#',  'dom_of',  'c-Evalue',  'i-Evalue',  'dom_score',  'dom_bias',  'hmm_from',
                     'hmm_to',  'ali_from', 'ali_to',  'env_from', 'env_to',  'mean_posterior', 'description of target']
-    print()
+
     desired_header = ['family_hmm', 'hmm_length', 'query_id',
                       'query_length', 'evalue', 'hmm_start',
                       'hmm_end', 'query_start', 'query_end']
@@ -410,8 +410,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     goodheader_df['query_end'] = lines_df['ali_to']
 
     unique_orfs = goodheader_df['orf_id'].unique()
-    print("Unique orfs: ")
-    print(unique_orfs)
+    #print("Unique orfs: ")
+    #print(unique_orfs)
 
     orflist = []
     orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
