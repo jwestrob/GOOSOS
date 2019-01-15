@@ -381,7 +381,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                           'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                           'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
         empty_df = pd.DataFrame(columns = orflist_header)
-        return empty_df
+        empty_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
+        return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
     #Python, by default, splits the description at the end, causing dimension mismatch.
@@ -553,7 +554,7 @@ def test():
 
     print(hmm_outfiles)
     sys.exit()
-    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
+    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None, hmm_outfiles))
     print(all_df_list[0])
 
     print("Good so far!")
