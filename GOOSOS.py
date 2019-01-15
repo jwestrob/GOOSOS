@@ -193,7 +193,7 @@ def extract_hits_by_hmm(red_df, threads, outdir):
     id_orf_list = red_df[['genome_id', 'orf_id']].values.tolist()
 
 
-    recs = list(p2.map(lambda genome_id, orf: get_rec_for_hit(genome_id, orf, outdir), id_orf_list))
+    recs = list(p2.map(lambda id_orf: get_rec_for_hit(id_orf[0], id_orf[1], outdir), id_orf_list))
 
     return recs
 
