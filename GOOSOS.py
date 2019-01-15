@@ -148,8 +148,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
     hits = pd.DataFrame(hitstable).T
     hits.columns = hmmlist
-    print(fastalist)
-    sys.exit()
+
     hits['id'] = fastalist
     #Get columns of DF
     cols = list(hits.columns.values)
