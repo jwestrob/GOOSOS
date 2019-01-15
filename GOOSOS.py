@@ -351,8 +351,7 @@ def prot_workflow():
     sys.exit(420)
 
 def parse_hmmdomtbl(outdir, hmmoutfile):
-    print('parse hmmdomtbl called')
-    goosos_dir = sys.argv[0].split('GOOSOS.py')[0]
+
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
 
@@ -389,8 +388,10 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     goodheader_df = pd.DataFrame(columns=desired_header)
 
     goodheader_df['family_hmm'] = lines_df['target name']
+    #Insert genome ID to avoid confusion
+    goodheader_df['genome_id'] = pd.Series([genome_id]*len(lines_df))
     goodheader_df['hmm_length'] = lines_df['tlen']
-    goodheader_df['query_id'] = lines_df['query name']
+    goodheader_df['orf_id'] = lines_df['query name']
     goodheader_df['query_length'] = lines_df['qlen']
     goodheader_df['evalue'] = lines_df['E-value']
     goodheader_df['c_evalue'] = lines_df['c-Evalue']
@@ -416,7 +417,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
             red_df = red_df[red_df['family_hmm'] == best_ORF]
 
         # if len(red_df) > 2: Complain to me about it and I can do something later
-
+        # or, I REALLY DON'T CARE DO U?
         if len(red_df) >= 2:
             sorted_red = red_df.sort_values(by='evalue', ascending=True)
             goodrow = sorted_red.iloc[0]
