@@ -375,9 +375,11 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
         return empty_df
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
-
+    print(domtbl_header)
+    print(lines_filtered[0])
+    sys.exit()
     #Make pandas DF to store lines, then add column names
-    lines_df = pd.DataFrame(lines_filtered, columns = domtbl_header)
+    lines_df = pd.DataFrame(lines_filtered, columns=domtbl_header)
 
 
     #Make DF to store properly arranged data
