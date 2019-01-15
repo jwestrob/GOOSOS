@@ -421,8 +421,6 @@ def test():
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
-    print("End make_hitstable_df")
-    sys.exit()
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
