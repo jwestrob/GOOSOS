@@ -197,7 +197,7 @@ def extract_hits(all_df, threads):
     recs_by_hmm = []
 
     #I could use a map, but like... why
-    for hmm in hmmlist:
+    for hmm in all_df['family_hmm'].unique().tolist():
         red_df = all_df[all_df['family_hmm'] == hmm]
         recs_by_hmm.append([extract_hits_by_hmm(red_df, threads), hmm])
 
