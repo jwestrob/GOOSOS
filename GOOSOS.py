@@ -409,12 +409,6 @@ def test():
     all_df = pd.concat(all_df_list, sort=False)
 
     recs_list_by_hmm = extract_hits(all_df, threads, outdir)
-    print(all_df.head())
-
-
-
-
-
 
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
@@ -424,6 +418,9 @@ def test():
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
+
+        print(recs_list_by_hmm[0])
+        sys.exit()
 
         hmms_written = list(p.map(lambda hits:
                                         write_recs(
