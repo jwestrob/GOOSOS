@@ -177,6 +177,7 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     recs_for_hmm = flatten(recs_for_hmm)
 
     print(recs_for_hmm)
+    print(hmm_name)
     sys.exit()
 
     recs_for_hmm = list(filter(lambda x: type(x) is not None, recs_for_hmm))
