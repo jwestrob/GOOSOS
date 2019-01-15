@@ -161,7 +161,6 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
         hmm_idx = hmmlist.index(hmm)
 
         for genome_hit in hmm_recs:
-            print(genome_hit)
             #Extract genome ID from fasta header
             try:
                 genome_id = genome_hit.id.split('|')[0]
@@ -169,6 +168,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
                 print(genome_id)
                 print(type(genome_id))
 
+            print(genome_id)
             hits[hits['id'] == genome_id][hmm] += 1
 
 
@@ -424,6 +424,8 @@ def test():
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
+    print("End make_hitstable_df")
+    sys.exit()
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
