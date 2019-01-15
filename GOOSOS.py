@@ -321,8 +321,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 def align_fn(fastafile_wpath, outdir, threads, accurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
     if accurate:
-        print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
-                + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
+        #print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > ' + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
         os.system('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
                 + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
     else:
@@ -330,8 +329,7 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
                 + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
     return
 
-def test():
-    args = parser.parse_args()
+def run_workflow():
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
     hmmdir = str(Path(args.hmmdir).absolute())
@@ -454,26 +452,7 @@ def test():
             list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
 
-    print("Good so far!")
-
-    sys.exit()
-
-    return
-
-
-def main():
-    args = parser.parse_args()
-
-    test()
-
-    if args.nuc:
-        nuc_workflow(args)
-    elif args.prot:
-        prot_workflow(args)
-    else:
-        print("Please specify a workflow- either nucleotide or protein. Exiting...")
-        sys.exit()
-
+    print("Boogie")
 
 if __name__ == "__main__":
-    main()
+    run_workflow()
