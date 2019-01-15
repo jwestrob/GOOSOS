@@ -80,8 +80,8 @@ def run_hmmscan(protfile, outdir, threshold):
         sys.exit()
     #print(result)
     #Parse file with awk/perl nonsense; generate .parse file
-    parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out')
-    return genome_id + '_hmmsearch.out'
+    return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold)
+
 
 def extract_hits_by_outfile(dir, infile):
     hits = []
@@ -350,7 +350,13 @@ def prot_workflow():
     print('boogie')
     sys.exit(420)
 
-def parse_hmmdomtbl(outdir, hmmoutfile):
+def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
+
+    """
+    Takes output file from HMMscan (--domtblout), parses it, and yields a
+    genome-specific dataframe of each hit (above the evalue threshold) for each
+    domain.
+    """
 
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
@@ -370,7 +376,10 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
     if len(lines_filtered) == 0:
         print("No hits for " + genome_id)
-        empty_df = pd.DataFrame(columns = desired_header)
+        orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+                          'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
+                          'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
+        empty_df = pd.DataFrame(columns = orflist_header)
         return empty_df
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
@@ -424,43 +433,45 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
             sorted_red = red_df.sort_values(by='evalue', ascending=True)
             goodrow = sorted_red.iloc[0]
             worse_row = sorted_red.iloc[1]
-            orflist.append([
-                            goodrow.family_hmm,
-                            goodrow.hmm_length,
-                            goodrow.query_id,
-                            goodrow.evalue,
-                            goodrow.c_evalue,
-                            goodrow.hmm_start,
-                            goodrow.hmm_end,
-                            goodrow.query_start,
-                            goodrow.query_end,
-                            worse_row.c_evalue,
-                            worse_row.hmm_start,
-                            worse_row.hmm_end,
-                            worse_row.query_start,
-                            worse_row.query_end])
+            if goodrow.evalue > threshold:
+                orflist.append([goodrow.family_hmm,
+                                goodrow.hmm_length,
+                                goodrow.query_id,
+                                goodrow.evalue,
+                                goodrow.c_evalue,
+                                goodrow.hmm_start,
+                                goodrow.hmm_end,
+                                goodrow.query_start,
+                                goodrow.query_end,
+                                worse_row.c_evalue,
+                                worse_row.hmm_start,
+                                worse_row.hmm_end,
+                                worse_row.query_start,
+                                worse_row.query_end])
+
         elif len(red_df) == 0:
-            print('Empty DF! ORF: ', orf)
+            print('Empty ORF DF! This should not happen. ORF: ', orf)
             sys.exit()
 
         else:
             goodrow = red_df.iloc[0]
-            orflist.append([goodrow.family_hmm,
-                            goodrow.hmm_length,
-                            goodrow.query_id,
-                            goodrow.evalue,
-                            goodrow.hmm_start,
-                            goodrow.hmm_end,
-                            goodrow.query_start,
-                            goodrow.query_end,
-                            'NaN'*5])
+            if goodrow.evalue > threshold:
+                orflist.append([goodrow.family_hmm,
+                                goodrow.hmm_length,
+                                goodrow.query_id,
+                                goodrow.evalue,
+                                goodrow.hmm_start,
+                                goodrow.hmm_end,
+                                goodrow.query_start,
+                                goodrow.query_end,
+                                'NaN'*5])
 
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
 
     orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
-    return
+    return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
 
 def test():
     args = parser.parse_args()
@@ -520,8 +531,7 @@ def test():
         #Make directory to store hmmsearch outfiles
         os.system('mkdir ' + outdir + '/hmmscan/')
 
-        for fastafile in protlist_wpath:
-
+        def run_hmms():
             fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
             # Make outdir for HMMs
             if not os.path.exists(fastaoutdir):
@@ -533,12 +543,11 @@ def test():
             # Run all HMMs for fastafile
             hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
 
-            #list(p.map(lambda hmmfile: run_hmmscan(fastafile, hmmfile, outdir, threshold), \
-            #                              hmmlist_wpath))
-            genome_id = hmm_outfiles[-1].split('_hmmsearch.out')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+        hmm_outfiles = p.map(run_hmms, protlist_wpath)
 
-            #print()
-            #os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
+        print("Good so far!")
+
+
 
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
