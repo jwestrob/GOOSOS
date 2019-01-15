@@ -354,7 +354,6 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
 
-    print('wacka flocka flame')
     c1 = "cat " + hmmoutfile_wpath
     c2 = "grep -v '^#'"
     c3 = "awk '{print $1,$3,$4,$6,$13,$16,$17,$18,$19}'"
@@ -377,6 +376,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     result = list(p9.communicate())
     #print(result)
     parse_outfile = result[0].decode('utf-8').split('\n')
+    print(parse_outfile)
     with open(outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile, 'w') as outfile:
         outfile.writelines(parse_outfile)
     #print
