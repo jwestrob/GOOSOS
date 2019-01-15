@@ -176,21 +176,30 @@ def get_recs_for_fasta_nuc(hmm, fastadir):
 
     return out_recs
 
-def extract_hits_by_hmm(hmm, fastalist, outdir, threads, best):
+def get_rec_for_hit(genome_id, orf):
+    return
+
+def extract_hits_by_hmm(red_df, threads):
     print("Extracting hits for " + hmm)
     p2 = Pool(threads)
 
-    recs = list(p2.map(lambda fastaname: get_recs_for_fasta(hmm, outdir + '/' + fastaname, best), fastalist))
+    #Make list of genome_id / orf pairs
+    id_orf_df = red_df[['genome_id', 'orf_id']].tolist()
+    print(id_orf_df)
+    sys.exit()
+
+    recs = list(p2.map(lambda genome_id, orf: get_rec_for_hit(genome_id, orf), fastalist))
 
     return recs
 
-def extract_hits(hmmlist, fastalist, outdir, threads, best):
+def extract_hits(all_df, threads):
     #List of recs (value to return)
     recs_by_hmm = []
 
     #I could use a map, but like... why
     for hmm in hmmlist:
-        recs_by_hmm.append([extract_hits_by_hmm(hmm, fastalist, outdir, threads, best), hmm])
+        red_df = all_df[all_df['family_hmm'] == hmm]
+        recs_by_hmm.append([extract_hits_by_hmm(red_df, threads), hmm])
 
     return recs_by_hmm
 
@@ -439,7 +448,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                 orflist.append([goodrow.family_hmm,
                                 genome_id,
                                 goodrow.hmm_length,
-                                goodrow.query_id,
+                                goodrow.orf_id,
                                 goodrow.evalue,
                                 goodrow.c_evalue,
                                 goodrow.hmm_start,
@@ -462,7 +471,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                 orflist.append([goodrow.family_hmm,
                                 genome_id,
                                 goodrow.hmm_length,
-                                goodrow.query_id,
+                                goodrow.orf_id,
                                 goodrow.evalue,
                                 goodrow.hmm_start,
                                 goodrow.hmm_end,
@@ -552,8 +561,10 @@ def test():
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
 
-    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None else x, hmm_outfiles))
+    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
+
+    recs_list_by_hmm = extract_hits(all_df)
     print(all_df.head())
 
     print("Good so far!")
