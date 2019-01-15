@@ -318,7 +318,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
     return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
 
-def align(outdir, threads, fastafile_wpath, accurate):
+def align_fn(fastafile_wpath, outdir, threads, accurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
     if accurate:
         print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
@@ -453,7 +453,7 @@ def test():
             print(out_fastas)
             sys.exit()
             os.system('mkdir ' + outdir + '/alignments')
-            list(map(lambda x: align(outdir, threads, x, accurate), out_fastas))
+            list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
 
     print("Good so far!")
