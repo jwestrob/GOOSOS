@@ -68,7 +68,7 @@ def run_hmmscan(protfile, outdir, threshold):
     genome_id = protfile.split('/')[-1].split('.faa')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
+    cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
