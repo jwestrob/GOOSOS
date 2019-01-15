@@ -409,7 +409,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
                       'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
-        red_df = goodheader_df[goodheader_df['query_id'] == orf]
+        red_df = goodheader_df[goodheader_df['orf_id'] == orf]
 
         #For the unlikely scenario where you have more than one HMM hit on a single ORF
         if len(red_df['family_hmm'].unique()) > 1:
