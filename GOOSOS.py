@@ -382,7 +382,7 @@ def test():
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
         #Get list of protein files without full path
-        protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
+        protlist = list(map(lambda path: path.split('/')[-1], protlist_wpath))
 
         #Make directory to store hmmsearch outfiles
         if not os.path.exists(outdir + '/hmmscan/'):
@@ -410,7 +410,7 @@ def test():
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
         #Get list of protein files without full path
-        protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
+        protlist = list(map(lambda path: path.split('/')[-1], protlist_wpath))
 
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
