@@ -162,7 +162,11 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
         for genome_hit in hmm_recs:
             #Extract genome ID from fasta header
-            genome_id = genome_hit.id.split('|')[0]
+            try:
+                genome_id = genome_hit.id.split('|')[0]
+            except:
+                print(genome_id)
+                print(type(genome_id))
 
             hits[hits['id'] == genome_id][hmm] += 1
 
