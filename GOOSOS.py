@@ -358,13 +358,93 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
 
-    #header =
+    domtbl_header = ['target name', 'accession', 'tlen', 'query name', 'accession', 'qlen', 'E-value',
+                    'full_score',  'full_bias',   'dom_#',  'dom_of',  'c-Evalue',  'i-Evalue',  'dom_score',  'dom_bias',  'hmm_from',
+                    'hmm_to',  'ali_from', 'ali_to',  'env_from', 'env_to',  'mean_posterior', 'description of target']
+    print()
+    desired_header = ['family_hmm', 'hmm_length', 'query_id',
+                      'query_length', 'evalue', 'hmm_start',
+                      'hmm_end', 'query_start', 'query_end']
 
     #Remove all lines with '#' beginning character
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
+    if len(lines_filtered) == 0:
+        print("No hits for " + genome_id)
+        empty_df = pd.DataFrame(columns = desired_header)
+        return empty_df
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
-    print(lines_filtered[0])
+
+    #Make pandas DF to store lines, then add column names
+    lines_df = pd.DataFrame(lines_filtered, columns = domtbl_header)
+
+
+    #Make DF to store properly arranged data
+    goodheader_df = pd.DataFrame(columns=desired_header)
+
+    goodheader_df['family_hmm'] = lines_df['target name']
+    goodheader_df['hmm_length'] = lines_df['tlen']
+    goodheader_df['query_id'] = lines_df['query name']
+    goodheader_df['query_length'] = lines_df['qlen']
+    goodheader_df['evalue'] = lines_df['E-value']
+    goodheader_df['hmm_start'] = lines_df['hmm_from']
+    goodheader_df['hmm_end'] = lines_df['hmm_to']
+    goodheader_df['query_start'] = lines_df['ali_from']
+    goodheader_df['query_end'] = lines_df['ali_to']
+
+    unique_orfs = goodheader_df['query_id'].unique()
+
+    orflist = []
+    orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'dom1_evalue', 'dom1_hmmstart',
+                      'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
+                      'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
+    for orf in unique_orfs:
+        red_df = goodheader_df[goodheader_df['query_id'] == orf]
+
+        #For the unlikely scenario where you have more than one HMM hit on a single ORF
+        if len(red_df['family_hmm'].unique()) > 1:
+            #You want ascending=True because you want the smallest values first
+            sorted_red = red_df.sort_values(by='evalue', ascending=True)
+            best_ORF = sorted_red.iloc[0].family_hmm
+            red_df = red_df[red_df['family_hmm'] == best_ORF]
+
+        # if len(red_df) > 2: Complain to me about it and I can do something later
+
+        if len(red_df) >= 2:
+            sorted_red = red_df.sort_values(by='evalue', ascending=True)
+            goodrow = sorted_red.iloc[0]
+            worse_row = sorted_red.iloc[1]
+            orflist.append([
+                            goodrow.family_hmm,
+                            goodrow.hmm_length,
+                            goodrow.query_id,
+                            goodrow.evalue,
+                            goodrow.hmm_start,
+                            goodrow.hmm_end,
+                            goodrow.query_start,
+                            goodrow.query_end,
+                            worse_row.evalue,
+                            worse_row.hmm_start,
+                            worse_row.hmm_end,
+                            worse_row.query_start,
+                            worse_row.query_end )
+
+        else:
+            goodrow = red_df.iloc[0]
+            orflist.append([goodrow.family_hmm,
+                            goodrow.hmm_length,
+                            goodrow.query_id,
+                            goodrow.evalue,
+                            goodrow.hmm_start,
+                            goodrow.hmm_end,
+                            goodrow.query_start,
+                            goodrow.query_end,
+                            'NaN'*5])
+
+
+    orf_df = pd.DataFrame(orflist, columns=orflist_header)
+
+    orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
     return
 
@@ -443,8 +523,8 @@ def test():
             #                              hmmlist_wpath))
             genome_id = hmm_outfiles[-1].split('_hmmsearch.out')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
 
-            print()
-            os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
+            #print()
+            #os.system('mv ' + outdir + '/hmmscan/' + hmm_outfiles[-1] + ' ' + outdir + '/hmmscan/' + genome_id + '/')
 
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
