@@ -176,9 +176,14 @@ def write_recs(recs_for_hmm, hmm_name, outdir):
     flatten = lambda l: [item for sublist in l for item in sublist]
     recs_for_hmm = flatten(recs_for_hmm)
 
+    print(recs_for_hmm)
+    sys.exit()
+
     recs_for_hmm = list(filter(lambda x: type(x) is not None, recs_for_hmm))
 
     print("Writing recs for " + hmm_name)
+
+
     SeqIO.write(recs_for_hmm, fasta_outdir + '/' + hmm_name + '_hits.faa', 'fasta')
     return
 
@@ -422,7 +427,7 @@ def test():
         print(recs_list_by_hmm[0])
         sys.exit()
 
-        hmms_written = list(p.map(lambda hits:
+        hmms_written = list(map(lambda hits:
                                         write_recs(
                                         #Actual list of recs
                                         hits[0],
