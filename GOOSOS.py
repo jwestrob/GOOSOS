@@ -376,7 +376,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     #print("End of piping process...")
     result = list(p9.communicate())
     #print(result)
-    parse_outfile = result[0].encode('utf-8').split('\n')
+    parse_outfile = result[0].decode('utf-8').split('\n')
     with open(outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile, 'w') as outfile:
         outfile.writelines(parse_outfile)
     #print
