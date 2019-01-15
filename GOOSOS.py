@@ -354,7 +354,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
 
-    c1 = "cat " + hmmoutfile_wpath
+    c1 = ["cat", hmmoutfile_wpath]
     c2 = "grep -v '^#'"
     c3 = "awk '{print $1,$3,$4,$6,$13,$16,$17,$18,$19}'"
     c4 = "sed 's/ /\t/g'"
@@ -364,7 +364,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c8 = "awk '$NF>0.3'"
     c9 = "sort -k 3 -k 8,9g"
     print(c1)
-    subprocess.call(c1, shell=True)
+    #subprocess.call(c1, shell=True)
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
