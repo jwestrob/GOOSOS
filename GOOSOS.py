@@ -366,6 +366,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     print(c1)
     #subprocess.call(c1, shell=True)
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
+    print('passed c1')
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
     p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE, shell=True)
