@@ -364,6 +364,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c8 = "awk '$NF>0.3'"
     c9 = "sort -k 3 -k 8,9g"
     print(c1)
+    subprocess.call(c1, shell=True)
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
