@@ -180,7 +180,7 @@ def get_rec_for_hit(genome_id, orf):
     return
 
 def extract_hits_by_hmm(red_df, threads):
-    print("Extracting hits for " + hmm)
+    print("Extracting hits for " + red_df.iloc[0].family_hmm)
     p2 = Pool(threads)
 
     #Make list of genome_id / orf pairs
