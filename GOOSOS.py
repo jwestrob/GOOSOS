@@ -156,9 +156,6 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
     cols.pop(cols.index('id'))
     hits = hits[['id'] + cols]
 
-    print(hits)
-    sys.exit()
-
     # Mark hits in table
     for hmm_recs, hmm in recs_by_hmm:
 
