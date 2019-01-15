@@ -355,7 +355,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
 
     c1 = ["cat", hmmoutfile_wpath]
-    c2 = "grep -v '^#'"
+    c2 = ["grep", "-v", "'^#'"]
     c3 = "awk '{print $1,$3,$4,$6,$13,$16,$17,$18,$19}'"
     c4 = "sed 's/ /\t/g'"
     c5 = "sort -k 3,3 -k 8n -k 9n"
@@ -368,13 +368,18 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
     print('passed c1')
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
+    print('passed c2')
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
+    print('passed c3')
     p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE, shell=True)
+    print('passed c4')
     p5 = subprocess.Popen(c5, stdin=p4.stdout, stdout=subprocess.PIPE, shell=True)
+    print('passed c5')
     p6 = subprocess.Popen(c6, stdin=p5.stdout, stdout=subprocess.PIPE, shell=True)
     p7 = subprocess.Popen(c7, stdin=p6.stdout, stdout=subprocess.PIPE, shell=True)
     p8 = subprocess.Popen(c8, stdin=p7.stdout, stdout=subprocess.PIPE, shell=True)
     p9 = subprocess.Popen(c9, stdin=p8.stdout, stdout=subprocess.PIPE, shell=True)
+    print('passed c9')
     #print("End of piping process...")
     result = list(p9.communicate())
     #print(result)
