@@ -181,7 +181,7 @@ def get_rec_for_hit(genome_id, orf, outdir):
     protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
-    desired_hit = list(filter(lambda x: orf in x.id, genome_recs))
+    desired_hit = list(filter(lambda x: orf in x.id, genome_recs))[0]
     desired_hit.id = genome_id + '|' + desired_hit.id
 
     return desired_hit
