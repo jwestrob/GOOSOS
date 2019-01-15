@@ -530,7 +530,8 @@ def test():
         protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
 
         #Make directory to store hmmsearch outfiles
-        os.system('mkdir ' + outdir + '/hmmscan/')
+        if not os.path.exists(outdir + '/hmmscan/'):
+            os.system('mkdir ' + outdir + '/hmmscan/')
 
         def run_hmms(fastafile):
             fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
