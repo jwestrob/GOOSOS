@@ -106,75 +106,6 @@ def extract_hits_by_outfile(dir, infile):
         except:
             return
 
-def extract_hits_by_outfile_NUC(dir, infile):
-    hits = []
-    print("extract_hits_by_outfile not implemented. Exiting...")
-    sys.exit()
-
-def get_recs_for_fasta(hmm, fastadir, best):
-
-    #Get name of FASTA so we can append that to the seqs for later identification
-    fasta_id = fastadir.split('/')[-1]
-
-    #There should only be one outfile matching the hmm provided
-    hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
-    hits = []
-    with open(fastadir + '/' + hmmfile, 'r') as handle:
-        for record in SearchIO.parse(handle, 'hmmer3-text'):
-            hits.append(list(record))
-
-    try:
-        hits = hits[0]
-    except:
-        return
-
-    good_hits = [hit._id for hit in hits]
-
-    #If specified, take the best e-value only
-    if best and len(good_hits) > 1:
-        good_hits = good_hits[e_values.index(min(e_values))]
-
-    out_recs = []
-
-    fastafile = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))[0]
-    fastafile = os.path.join(fastadir, fastafile)
-    for rec in SeqIO.parse(fastafile, 'fasta'):
-        if rec.id in good_hits:
-            rec.id = fasta_id + '|' + rec.id
-            out_recs.append(rec)
-
-    return out_recs
-
-def get_recs_for_fasta_nuc(hmm, fastadir):
-
-    #Get name of FASTA so we can append that to the seqs for later identification
-    fasta_id = fastadir.split('/')[-1]
-
-    #There should only be one outfile matching the hmm provided
-    hmmfile = list(filter(lambda x: hmm in x, os.listdir(fastadir)))[0]
-    hits = []
-    with open(fastadir + '/' + hmmfile, 'r') as handle:
-        for record in SearchIO.parse(handle, 'hmmer3-text'):
-            hits.append(list(record))
-
-    try:
-        hits = hits[0]
-    except:
-        return
-
-    hits = [hit._id for hit in hits]
-    evalues = [hit.evalue for hit in hits]
-
-    out_recs = []
-
-    fastafile = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))[0]
-    fastafile = os.path.join(fastadir, fastafile)
-    for rec in SeqIO.parse(fastafile, 'fasta'):
-        if rec.id in good_hits:
-            rec.id = fasta_id + '|' + rec.id
-            out_recs.append(rec)
-
-    return out_recs
 
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_dir = outdir + '/hmmscan/' + genome_id + '/'
@@ -215,30 +146,6 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
     print("Making hits matrix...")
     hitstable = np.zeros((len(hmmlist), len(fastalist)))
 
-
-
-    # Mark hits in table
-    for hmm_recs, hmm in recs_by_hmm:
-        print("Hmm recs:")
-        print(hmm_recs)
-        sys.exit()
-
-        hmm_idx = hmmlist.index(hmm)
-
-        for genome_idx, genome_hits in enumerate(hmm_recs):
-
-            sys.exit()
-            if type(genome_hits) is list:
-                hits = len(genome_hits)
-            #Used to make it a string if there was only one hit;
-            #Not like that now but this doesn't hurt anything (all should be list)
-            elif type(genome_hits) is str:
-                hits = 1
-            if genome_hits is None:
-                hitstable[hmm_idx][genome_idx] = 0
-            else:
-                hitstable[hmm_idx][genome_idx] = hits
-
     hits = pd.DataFrame(hitstable).T
     hits.columns = hmmlist
     hits['id'] = fastalist
@@ -247,6 +154,19 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
     #Move IDs column to first index, for to make it look pretty
     cols.pop(cols.index('id'))
     hits = hits[['id'] + cols]
+
+    # Mark hits in table
+    for hmm_recs, hmm in recs_by_hmm:
+
+        hmm_idx = hmmlist.index(hmm)
+
+        for genome_hit in hmm_recs:
+            #Extract genome ID from fasta header
+            genome_id = genome_hit.id.split('|')[0]
+
+            hits[hits['id'] == genome_id][hmm_idx] += 1
+
+
     #Write it to tsv in outdir without index (annoying)
     hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
 
