@@ -450,8 +450,6 @@ def test():
         if align:
             out_fastas = os.listdir(outdir + '/fastas')
             out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
-            print(out_fastas)
-            sys.exit()
             os.system('mkdir ' + outdir + '/alignments')
             list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
