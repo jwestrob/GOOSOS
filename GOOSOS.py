@@ -184,6 +184,7 @@ def extract_hits_by_hmm(red_df, threads):
     p2 = Pool(threads)
 
     #Make list of genome_id / orf pairs
+    print(red_df.columns.values)
     id_orf_df = red_df[['genome_id', 'orf_id']].tolist()
     print(id_orf_df)
     sys.exit()
