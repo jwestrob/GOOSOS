@@ -363,7 +363,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c7 = "perl -e 'while(<>){chomp;@a=split(/\t/,$_);if(($a[-1]-$a[-2])>80){print $_," + '"\t"' + ",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-5;}else{print $_,"+'"\t"'+",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-3;}}'"
     c8 = "awk '$NF>0.3'"
     c9 = "sort -k 3 -k 8,9g"
-    p1 = subprocess.Popen(c1, stdout=subprocess.PIPE)
+    p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     p3 = subprocess.Popen(c3, stdin=p2.stdout, stdout=subprocess.PIPE, shell=True)
     p4 = subprocess.Popen(c4, stdin=p3.stdout, stdout=subprocess.PIPE, shell=True)
