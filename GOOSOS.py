@@ -426,7 +426,9 @@ def test():
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
-
+    print("Protlist:")
+    print(protlist)
+    sys.exit()
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
     print("End make_hitstable_df")
     sys.exit()
