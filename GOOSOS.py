@@ -538,14 +538,14 @@ def test():
             if not os.path.exists(fastaoutdir):
                 os.system('mkdir ' + fastaoutdir)
             #Make symbolic link
-            if not os.path.islink(fastaoutdir + '/' + fastafile):
+            if len(list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))) == 0:
                 os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
             hmm_outfiles.append([])
 
             # Run all HMMs for fastafile
             hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
 
-        hmm_outfiles = p.map(run_hmms, protlist_wpath)
+        hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
         print("Good so far!")
 
