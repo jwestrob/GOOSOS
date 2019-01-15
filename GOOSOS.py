@@ -438,14 +438,30 @@ def run_workflow():
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
 
+        def sort_fasta(fastafile_wpath, fastalist):
+            in_recs = list(SeqIO.parse(fastafile_wpath, 'fasta'))
+            out_recs = []
+            for fasta in fastalist:
+                rec_to_append = list(filter(lambda x: fasta in x.id, in_recs))
+                out_recs.append(rec_to_append)
+            SeqIO.write(out_recs, fastafile_wpath, 'fasta')
+            return
+
         if align:
             out_fastas = os.listdir(outdir + '/fastas')
             out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
+            #Sort those fastas before aligning!
+            p.map(lambda x: sort_fasta(x, protlist), out_fastas)
             os.system('mkdir ' + outdir + '/alignments')
             list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
 
-    print("Boogie")
+    with open(outdir + '/genome_order.csv', 'w') as outfile:
+        outfile.writelines(protlist)
+
+    print("Order of sorted alignments written to genome_order.csv.")
+
+    print("You did it!")
 
 if __name__ == "__main__":
     run_workflow()
