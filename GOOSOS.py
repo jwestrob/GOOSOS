@@ -554,7 +554,7 @@ def test():
 
     print(hmm_outfiles)
     sys.exit()
-    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None, hmm_outfiles))
+    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None else x, hmm_outfiles))
     print(all_df_list[0])
 
     print("Good so far!")
