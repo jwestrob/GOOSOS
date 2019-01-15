@@ -322,9 +322,9 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
     if accurate:
         print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
-                + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
+                + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
         os.system('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
-                + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
+                + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
     else:
         os.system('mafft --thread ' + str(threads) + ' ' + fastafile_wpath + ' > '
                 + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
