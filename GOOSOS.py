@@ -197,7 +197,7 @@ def extract_hits_by_hmm(red_df, threads, outdir):
 
     return recs
 
-def extract_hits(all_df, threads):
+def extract_hits(all_df, threads, outdir):
     #List of recs (value to return)
     recs_by_hmm = []
 
