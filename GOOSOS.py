@@ -401,6 +401,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     goodheader_df['query_end'] = lines_df['ali_to']
 
     unique_orfs = goodheader_df['query_id'].unique()
+    print("Unique orfs: ")
+    print(unique_orfs)
 
     orflist = []
     orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
@@ -440,7 +442,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
         elif len(red_df) == 0:
             print('Empty DF! ORF: ', orf)
             sys.exit()
-            
+
         else:
             goodrow = red_df.iloc[0]
             orflist.append([goodrow.family_hmm,
