@@ -176,19 +176,24 @@ def get_recs_for_fasta_nuc(hmm, fastadir):
 
     return out_recs
 
-def get_rec_for_hit(genome_id, orf):
-    return
+def get_rec_for_hit(genome_id, orf, outdir):
+    genome_dir = outdir + '/hmmscan/' + genome_id + '/'
+    protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))
+    genome_recs = list(SeqIO.parse(protfile, 'fasta'))
 
-def extract_hits_by_hmm(red_df, threads):
+    desired_hit = list(filter(lambda x: orf in x.id, genome_recs))
+
+    return desired_hit
+
+def extract_hits_by_hmm(red_df, threads, outdir):
     print("Extracting hits for " + red_df.iloc[0].family_hmm)
     p2 = Pool(threads)
 
     #Make list of genome_id / orf pairs
     id_orf_df = red_df[['genome_id', 'orf_id']].values.tolist()
-    print(id_orf_df)
-    sys.exit()
 
-    recs = list(p2.map(lambda genome_id, orf: get_rec_for_hit(genome_id, orf), fastalist))
+
+    recs = list(p2.map(lambda genome_id, orf: get_rec_for_hit(genome_id, orf, outdir), fastalist))
 
     return recs
 
@@ -199,7 +204,7 @@ def extract_hits(all_df, threads):
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
         red_df = all_df[all_df['family_hmm'] == hmm]
-        recs_by_hmm.append([extract_hits_by_hmm(red_df, threads), hmm])
+        recs_by_hmm.append([extract_hits_by_hmm(red_df, threads, outdir), hmm])
 
     return recs_by_hmm
 
@@ -564,7 +569,7 @@ def test():
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
 
-    recs_list_by_hmm = extract_hits(all_df, threads)
+    recs_list_by_hmm = extract_hits(all_df, threads, outdir)
     print(all_df.head())
 
     print("Good so far!")
