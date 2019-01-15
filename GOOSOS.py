@@ -359,7 +359,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
 
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
     lines_filtered = list(map(lambda x: x.strip('\n'), lines_filtered))
-    print(lines_filtered)
+    print(lines_filtered[0].split())
 
     return
 
