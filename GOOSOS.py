@@ -365,7 +365,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c9 = "sort -k 3 -k 8,9g"
     #print(c1)
     #subprocess.call(c1, shell=True)
-    c1 = ['sh', goosos_dir + '/hmmscan-parser.sh']
+    c1 = ['sh', goosos_dir + '/hmmscan-parser.sh', hmmoutfile_wpath]
+    print(c1)
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
     print(list(p1.communicate()))
     """
