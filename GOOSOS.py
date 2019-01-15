@@ -173,12 +173,6 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 def write_recs(recs_for_hmm, hmm_name, outdir):
     fasta_outdir = outdir + '/fastas'
 
-    print("Recs for HMM:")
-    print(recs_for_hmm)
-    print("HMM Name:")
-    print(hmm_name)
-    sys.exit()
-
     recs_for_hmm = list(filter(lambda x: type(x) is not None, recs_for_hmm))
 
     print("Writing recs for " + hmm_name)
