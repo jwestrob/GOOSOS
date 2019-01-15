@@ -451,7 +451,7 @@ def test():
             out_fastas = os.listdir(outdir + '/fastas')
             out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
             os.system('mkdir ' + outdir + '/alignments')
-            list(map(lambda x: align(outdir, threads, x, accurate)
+            list(map(lambda x: align(outdir, threads, x, accurate)))
 
 
     print("Good so far!")
