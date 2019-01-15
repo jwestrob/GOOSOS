@@ -317,7 +317,8 @@ def prot_workflow():
             if not os.path.exists(fastaoutdir):
                 os.system('mkdir ' + fastaoutdir)
             #Make symbolic link
-            os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+            if not os.path.exists(fastaoutdir + '/' + fastafile):
+                os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
             hmm_outfiles.append([])
 
             # Run all HMMs for fastafile
