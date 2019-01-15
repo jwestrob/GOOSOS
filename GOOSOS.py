@@ -168,7 +168,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
 
     #Write it to tsv in outdir without index (annoying)
-    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t', index=False)
+    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t')
 
 def write_recs(recs_for_hmm, hmm_name, outdir):
     fasta_outdir = outdir + '/fastas'
