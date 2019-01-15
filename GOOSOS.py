@@ -383,7 +383,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                     'full_score',  'full_bias',   'dom_#',  'dom_of',  'c-Evalue',  'i-Evalue',  'dom_score',  'dom_bias',  'hmm_from',
                     'hmm_to',  'ali_from', 'ali_to',  'env_from', 'env_to',  'mean_posterior', 'description of target']
 
-    desired_header = ['family_hmm', 'hmm_length', 'query_id',
+    desired_header = ['family_hmm', 'hmm_length', 'orf_id',
                       'query_length', 'evalue', 'hmm_start',
                       'hmm_end', 'query_start', 'query_end']
 
@@ -391,7 +391,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
     if len(lines_filtered) == 0:
         print("No hits for " + genome_id)
-        orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+        orflist_header = ['family_hmm', 'hmm_length', 'orf_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
                           'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                           'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
         empty_df = pd.DataFrame(columns = orflist_header)
@@ -572,13 +572,31 @@ def test():
     recs_list_by_hmm = extract_hits(all_df, threads, outdir)
     print(all_df.head())
 
-    print("Good so far!")
+
+
 
 
 
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
+
+    make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir)
+
+    if not no_seqs:
+        print("Getting recs and writing to fasta...")
+
+        hmms_written = list(p.map(lambda hits:
+                                        write_recs(
+                                        #Actual list of recs
+                                        hits[0],
+                                        #Name of HMM to write (for fasta name)
+                                        hits[1],
+                                        outdir),
+                                        #List of recs to iterate over
+                                        recs_list_by_hmm))
+
+    print("Good so far!")
 
     sys.exit()
 
