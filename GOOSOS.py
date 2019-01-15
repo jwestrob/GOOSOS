@@ -11,15 +11,8 @@ import argparse
 
 parser = argparse.ArgumentParser(
     description='Given a directory of protein fasta files, extract the hits for each HMM for each bin; get multifasta of each protein')
-
-parser.add_argument('-nuc', action='store_true',
-                    default=False, help='Run GOOSOS Nucleotide workflow. Ignores -protdir')
-parser.add_argument('-prot', action='store_true',
-                    default=False, help='Run GOOSOS protein  workflow. If -nucdir is provided, includes predicted proteins from nucleotide sequences.')
 parser.add_argument('-nucdir', metavar='[NUCLEOTIDE FASTA DIRECTORY]',
                     help='Directory containing nucleotide sequences.')
-parser.add_argument('-protdir', metavar='[PROTEIN FASTA DIRECTORY]',
-                    help="Directory of protein fasta files to scan for ribosomal proteins. MUST END IN .faa EXTENSION")
 parser.add_argument('-hmmdir', metavar='[HMM DIRECTORY]', help="Directory containing HMM files to scan with")
 parser.add_argument('-outdir', metavar='[Output Directory]', default='output', help="Directory to store output files")
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
