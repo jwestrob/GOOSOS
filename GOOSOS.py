@@ -167,8 +167,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
             except:
                 print(genome_id)
                 print(type(genome_id))
-
-            print(genome_id)
+            print(hits[hits['id'] == genome_id])
             hits[hits['id'] == genome_id][hmm] += 1
 
 
