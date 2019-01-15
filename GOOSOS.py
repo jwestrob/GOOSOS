@@ -377,7 +377,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     #print(result)
     parse_outfile = result[0].decode('utf-8').split('\n')
     print(parse_outfile)
-    with open(outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile, 'w') as outfile:
+    with open(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmout.parse', 'w') as outfile:
         outfile.writelines(parse_outfile)
     #print
 
