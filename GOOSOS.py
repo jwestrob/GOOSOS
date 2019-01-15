@@ -427,7 +427,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
                             worse_row.hmm_start,
                             worse_row.hmm_end,
                             worse_row.query_start,
-                            worse_row.query_end )
+                            worse_row.query_end])
 
         else:
             goodrow = red_df.iloc[0]
