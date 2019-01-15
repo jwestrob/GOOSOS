@@ -393,6 +393,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     goodheader_df['query_id'] = lines_df['query name']
     goodheader_df['query_length'] = lines_df['qlen']
     goodheader_df['evalue'] = lines_df['E-value']
+    goodheader_df['c_evalue'] = lines_df['c-Evalue']
     goodheader_df['hmm_start'] = lines_df['hmm_from']
     goodheader_df['hmm_end'] = lines_df['hmm_to']
     goodheader_df['query_start'] = lines_df['ali_from']
@@ -401,7 +402,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     unique_orfs = goodheader_df['query_id'].unique()
 
     orflist = []
-    orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'dom1_evalue', 'dom1_hmmstart',
+    orflist_header = ['family_hmm', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
                       'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
@@ -425,11 +426,12 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
                             goodrow.hmm_length,
                             goodrow.query_id,
                             goodrow.evalue,
+                            goodrow.c_evalue,
                             goodrow.hmm_start,
                             goodrow.hmm_end,
                             goodrow.query_start,
                             goodrow.query_end,
-                            worse_row.evalue,
+                            worse_row.c_evalue,
                             worse_row.hmm_start,
                             worse_row.hmm_end,
                             worse_row.query_start,
