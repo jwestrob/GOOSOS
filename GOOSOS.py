@@ -219,12 +219,14 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
     # Mark hits in table
     for hmm_recs, hmm in recs_by_hmm:
+        print("Hmm recs:")
+        print(hmm_recs)
+        sys.exit()
 
         hmm_idx = hmmlist.index(hmm)
 
         for genome_idx, genome_hits in enumerate(hmm_recs):
-            print("Genome hits:")
-            print(genome_hits)
+
             sys.exit()
             if type(genome_hits) is list:
                 hits = len(genome_hits)
