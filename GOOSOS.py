@@ -363,10 +363,11 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c7 = "perl -e 'while(<>){chomp;@a=split(/\t/,$_);if(($a[-1]-$a[-2])>80){print $_," + '"\t"' + ",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-5;}else{print $_,"+'"\t"'+",($a[-3]-$a[-4])/$a[1],"+'"\n"'+" if $a[4]<1e-3;}}'"
     c8 = "awk '$NF>0.3'"
     c9 = "sort -k 3 -k 8,9g"
-    print(c1)
+    #print(c1)
     #subprocess.call(c1, shell=True)
-    c1 = ['sh', goosos_dir + '/hmmscan-parser.sh', '>', hmmoutfile_wpath.split(hmmoutfile)[0] + 'testout.parse'] 
+    c1 = ['sh', goosos_dir + '/hmmscan-parser.sh']
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
+    print(list(p1.communicate()))
     """
     print('passed c1')
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
