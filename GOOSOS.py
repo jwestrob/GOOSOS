@@ -357,7 +357,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
 
-    header =
+    #header =
 
     #Remove all lines with '#' beginning character
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
