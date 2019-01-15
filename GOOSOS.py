@@ -73,6 +73,7 @@ def run_hmmscan(protfile, outdir, threshold):
     print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
+        print(result)
         print('HMMscan error (check for empty sequences in your protein FASTAs)')
         print('genome_id: ', genome_id)
         #print('hmmfile: ', hmmfile)
