@@ -164,7 +164,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
             #Extract genome ID from fasta header
             genome_id = genome_hit.id.split('|')[0]
 
-            hits[hits['id'] == genome_id][hmm_idx] += 1
+            hits[hits['id'] == genome_id][hmm] += 1
 
 
     #Write it to tsv in outdir without index (annoying)
