@@ -357,7 +357,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
 
-    lines_filtered = list(filter(lambda x: x[0] != '#', lines))
+    lines_filtered = list(filter(lambda x: x[0] != '#', lines)).map(lambda x: x.strip('\n'))
     print(lines_filtered)
 
     return
