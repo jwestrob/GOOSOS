@@ -400,7 +400,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     goodheader_df['query_start'] = lines_df['ali_from']
     goodheader_df['query_end'] = lines_df['ali_to']
 
-    unique_orfs = goodheader_df['query_id'].unique()
+    unique_orfs = goodheader_df['orf_id'].unique()
     print("Unique orfs: ")
     print(unique_orfs)
 
