@@ -71,7 +71,7 @@ def run_hmmscan(protfile, outdir, threshold):
     cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
             + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
     print(cmd)
-    result = subprocess.getstatusoutput(cmd)
+    result = subprocess.getstatusoutput(cmd).wait()
     if result[0] != 0:
         print('HMMscan error (check for empty sequences in your protein FASTAs)')
         print('genome_id: ', genome_id)
@@ -357,9 +357,13 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
 
+    header =
+
+    #Remove all lines with '#' beginning character
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
-    lines_filtered = list(map(lambda x: x.strip('\n'), lines_filtered))
-    print(lines_filtered[0].split())
+    #Remove newline characters and split by whitespace
+    lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
+    print(lines_filtered[0])
 
     return
 
