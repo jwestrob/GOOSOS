@@ -456,11 +456,10 @@ def run_workflow():
             list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
 
-    with open(outdir + '/genome_order.txt', 'w') as outfile:
-        for element in protlist:
-            outfile.writelines(element)
+    prot_series = pd.Series(protlist)
+    prot_series.to_csv(outdir + '/genome_order.csv', sep=',', index=False, header=None)
 
-    print("Order of sorted alignments written to genome_order.csv.")
+    print("Order of sorted alignments written to genome_order.txt.")
 
     print("You did it!")
 
