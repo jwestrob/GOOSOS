@@ -437,7 +437,10 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
                             worse_row.hmm_end,
                             worse_row.query_start,
                             worse_row.query_end])
-
+        elif len(red_df) == 0:
+            print('Empty DF! ORF: ', orf)
+            sys.exit()
+            
         else:
             goodrow = red_df.iloc[0]
             orflist.append([goodrow.family_hmm,
