@@ -351,6 +351,7 @@ def prot_workflow():
     sys.exit(420)
 
 def parse_hmmdomtbl(outdir, hmmoutfile):
+    print('parse hmmdomtbl called')
     goosos_dir = sys.argv[0].split('GOOSOS.py')[0]
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
     hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
