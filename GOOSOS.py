@@ -65,7 +65,7 @@ def run_hmmsearch(protfile, hmmfile, outdir, threshold):
     return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
 
 def run_hmmscan(protfile, outdir, threshold):
-    genome_id = protfile.split('/')[-1].split('.faa')[0]
+    genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
 
     #print(protein_id, hmmfile)
     cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw -E ' \
