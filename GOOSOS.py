@@ -426,7 +426,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     #print(unique_orfs)
 
     orflist = []
-    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'query_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
                       'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
@@ -471,8 +471,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
             if float(goodrow.evalue) < threshold:
                 orflist.append([goodrow.family_hmm,
                                 genome_id,
-                                goodrow.hmm_length,
                                 goodrow.orf_id,
+                                goodrow.hmm_length,
                                 goodrow.evalue,
                                 goodrow.hmm_start,
                                 goodrow.hmm_end,
