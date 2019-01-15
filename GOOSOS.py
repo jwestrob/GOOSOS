@@ -69,8 +69,7 @@ def run_hmmscan(protfile, outdir, threshold):
 
     #print(protein_id, hmmfile)
     cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '_hmmsearch.out  --notextw -E ' \
-            + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile
-            + ' > /dev/null 2>&1'
+            + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
