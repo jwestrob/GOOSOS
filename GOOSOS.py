@@ -173,9 +173,6 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 def write_recs(recs_for_hmm, hmm_name, outdir):
     fasta_outdir = outdir + '/fastas'
 
-    flatten = lambda l: [item for sublist in l for item in sublist]
-    recs_for_hmm = flatten(recs_for_hmm)
-
     print("Recs for HMM:")
     print(recs_for_hmm)
     print("HMM Name:")
