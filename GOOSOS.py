@@ -546,7 +546,7 @@ def test():
             hmm_outfiles.append([])
 
             # Run all HMMs for fastafile
-            hmm_outfiles[-1] = run_hmmscan(fastafile, outdir, threshold)
+            return run_hmmscan(fastafile, outdir, threshold)
 
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
