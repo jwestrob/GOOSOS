@@ -538,7 +538,7 @@ def test():
             if not os.path.exists(fastaoutdir):
                 os.system('mkdir ' + fastaoutdir)
             #Make symbolic link
-            if len(list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))) == 0:
+            if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
                 os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
             hmm_outfiles.append([])
 
