@@ -223,6 +223,9 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
         hmm_idx = hmmlist.index(hmm)
 
         for genome_idx, genome_hits in enumerate(hmm_recs):
+            print("Genome hits:")
+            print(genome_hits)
+            sys.exit()
             if type(genome_hits) is list:
                 hits = len(genome_hits)
             #Used to make it a string if there was only one hit;
