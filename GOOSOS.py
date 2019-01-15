@@ -404,7 +404,7 @@ def test():
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
     #Make sure these variables are loaded in case you activated -already_scanned
-    if already_scanned:
+    else:
         protdir = outdir + '/proteins'
 
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
@@ -428,6 +428,7 @@ def test():
         os.system('mkdir ' + outdir + '/' + 'fastas')
     print("Protlist:")
     print(protlist)
+    print(protlist_wpath)
     sys.exit()
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
     print("End make_hitstable_df")
