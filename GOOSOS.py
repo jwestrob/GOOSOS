@@ -258,7 +258,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
     orflist = []
     orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
-                      'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
+                      'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_cevalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
         red_df = goodheader_df[goodheader_df['orf_id'] == orf]

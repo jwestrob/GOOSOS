@@ -11,9 +11,17 @@ Asking the important questions as always, I see. I pronounce it like one might p
 
 # What is Gooses supposed to do, then?
 
-Given a set of protein fastas and a set of HMMs (ribosomal or not- SCGs or other stuff would be fine), this script will pull out the HMM hits from your protein fastas, and put them in a certain order so you can align them and later concatenate them to do phylogenetic analysis.
+Given a set of nucleotide fastas and a set of HMMs (ribosomal or not- SCGs or other stuff would be fine), this script will predict protein sequences for your nucleotide sequences, pull out the HMM hits from the resulting protein fastas, and put them in a certain order so you can align them and later concatenate them to do phylogenetic analysis.
 
-This script also yields a 'hits table', which is a matrix (in .tsv format) of hits per genome. This is so you can quality-check later and remove genomes which don't have enough hits to be included in your phylogenetic analysis.
+GOOSOS compresses the HMMs you provide into a binary database, then searches the predicted protein sequences for hits to those HMMs using HMMscan. I then parse out all those
+
+This script yields two tab-separated dataframe-style output files: `all_hits_evalues_df.tsv` and `HITSTABLE.tsv`.
+
+- `all_hits_evalues_df.tsv` has a list of hits organized by genome of origin, along with ORF numbers indicating the contig/scaffold they originated from in the original nucleotide data, so that you can check for synteny among your hits. This is intended for ribosomal protein analyses, but might hopefully be useful when looking at other proteins too. (Trying to find an operon, perhaps?) This dataframe also contains helpful e-value information on your hits, so that you can determine a sensible cutoff value if you haven't yet determined one (or don't want to just pick a threshold before looking at your data).
+
+    - Wondering what all this nonsense about domain 1 and 2 is? Well, lots of hits (at least for the ribosomal sequences I've been looking at) have two different domains, so I've included information on both of those domains when relevant. I am not particularly interested in cases where you might have more than two domain hits for a single ORF, but if you are and you're concerned about this let me know I guess. I can adapt this dataframe to include potential relevant information. If you want to check whether there are ORFs with >2 hits, look at the HMMscan outfiles (output/hmmscan/). 
+
+- `HITSTABLE.tsv` indicates how many hits for each HMM are in each genome. I use this for quality control once I've done all my scanning- for instance, you might not want to include genomes that have 2 distinct hits for each of your ribosomal HMMs when doing phylogenomic analyses. (Looking at you, SAR202 megabins)
 
 I hope this will be useful for other things as well, though, and if you see things that you'd like this script to do which aren't already incorporated, just let me know and I'll be happy to help out if it's not gonna take, like, a week.
 
@@ -29,6 +37,8 @@ So glad to see the enthusiasm. Here's a list. I know you love those.
 
 - If you don't want to write seqs and only want a hits table (-no_seqs) : Saves time if you're trying to calibrate your e-value threshold.
 
+- Wanna align your sequences? Just put `-align` in your arguments. If you'd like to use the more accurate parameters for MAFFT, which I recommend, add `-align -accurate`. This will take longer, and doesn't scale particularly well with datasets of increasing size, but if you're doing phylogenomic analysis post-alignment, I highly recommend it.
+
 This list will be updated iteratively as I put more stuff in here.
 
 # What are the dependencies?
@@ -41,6 +51,7 @@ The packages you will need to install (using a variant of the command 'pip insta
 - Biopython
 - Pandas
 - Argparse
+- Mafft (If you want to align sequences)
 
 Everything else should come standard with your install of python.
 
