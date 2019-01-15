@@ -553,7 +553,7 @@ def test():
 
 
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None else x, hmm_outfiles))
-    all_df = pd.concat(all_df_list)
+    all_df = pd.concat(all_df_list, sort=False)
     print(all_df.head())
 
     print("Good so far!")
