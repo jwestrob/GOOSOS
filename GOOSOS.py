@@ -179,7 +179,7 @@ def get_recs_for_fasta_nuc(hmm, fastadir):
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_dir = outdir + '/hmmscan/' + genome_id + '/'
     protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
-    genome_recs = list(SeqIO.parse(protfile, 'fasta'))
+    genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
     desired_hit = list(filter(lambda x: orf in x.id, genome_recs))
 
