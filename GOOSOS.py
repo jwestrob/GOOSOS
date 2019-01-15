@@ -528,6 +528,9 @@ def test():
 
     hmm_outfiles = []
 
+
+
+
     if not already_scanned:
         if not ran_prodigal:
             #Make folder for proteins
@@ -538,6 +541,7 @@ def test():
 
             #Generate binary files for hmmsearch
             hmmpress(hmmlist_wpath, outdir)
+
 
         protdir = outdir + '/proteins'
 
@@ -565,6 +569,14 @@ def test():
 
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
+    #Make sure these variables are loaded in case you activated -already_scanned
+    if already_scanned:
+        protdir = outdir + '/proteins'
+
+        protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
+
+        #Get list of protein files without full path
+        protlist = list(map(lambda path: path.split('/')[0], protlist_wpath))
 
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
@@ -581,7 +593,7 @@ def test():
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
 
-    make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir)
+    make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
 
     if not no_seqs:
         print("Getting recs and writing to fasta...")
