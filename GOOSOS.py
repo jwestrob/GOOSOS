@@ -182,6 +182,7 @@ def get_rec_for_hit(genome_id, orf, outdir):
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
     desired_hit = list(filter(lambda x: orf in x.id, genome_recs))
+    desired_hit.id = genome_id + '|' + desired_hit.id
 
     return desired_hit
 
@@ -262,108 +263,7 @@ def run_prodigal(fastafile_wpath, outdir):
     os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
                             fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
     print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
-
-def nuc_workflow():
-    print("Nucleotide workflow not yet implemented. Don't get ahead of yourself.")
-    sys.exit()
-
-    args = parser.parse_args()
-    fastadir = str(Path(args.fastadir).absolute())
-    hmmdir = str(Path(args.hmmdir).absolute())
-    outdir = str(args.outdir)
-    threshold = float(args.evalue)
-    threads = int(args.threads)
-    already_scanned = args.already_scanned
-    no_seqs = args.no_seqs
-    best = args.best
-
-    p = Pool(threads)
-
-def prot_workflow():
-    args = parser.parse_args()
-    fastadir = str(Path(args.fastadir).absolute())
-    hmmdir = str(Path(args.hmmdir).absolute())
-    outdir = str(args.outdir)
-    threshold = float(args.evalue)
-    threads = int(args.threads)
-    already_scanned = args.already_scanned
-    no_seqs = args.no_seqs
-    best = args.best
-
-
-    p = Pool(threads)
-
-    # Make output directory
-    if not os.path.exists(outdir):
-        os.system('mkdir ' + outdir)
-        outdir = str(Path(outdir).absolute())
-    else:
-        outdir = str(Path(outdir).absolute())
-
-    # Get list of paths of all fastas
-    fastalist_wpath = list(map(lambda file: os.path.join(fastadir, file), os.listdir(fastadir)))
-
-    # Get list of all fastas
-    fastalist = list(map(lambda file: file.split('.faa')[0], os.listdir(fastadir)))
-
-    # Get list of paths of all HMM files
-    hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), os.listdir(hmmdir)))
-
-    # Get list of all HMMs
-    hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
-
-    hmm_outfiles = []
-
-    # For each fasta, run all hmms
-    if not already_scanned:
-
-        print("Beginning HMMscan...")
-
-        print("Pressing HMM files to binary...")
-        hmmpress(hmmlist_wpath, outdir)
-
-        #Make directory to store hmmsearch outfiles
-        os.system('mkdir ' + outdir + '/hmmscan/')
-
-        for fastafile in fastalist_wpath:
-            fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0]
-            # Make outdir for HMMs
-            if not os.path.exists(fastaoutdir):
-                os.system('mkdir ' + fastaoutdir)
-            #Make symbolic link
-            if not os.path.islink(fastaoutdir + '/' + fastafile):
-                os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
-            hmm_outfiles.append([])
-
-            # Run all HMMs for fastafile
-            hmm_outfiles[-1] = list(p.map(lambda hmmfile: run_hmmsearch(fastafile, hmmfile, outdir, threshold), \
-                                          hmmlist_wpath))
-
-
-    # Make directory to store fastas
-    if not os.path.exists(outdir + '/' + 'fastas'):
-        os.system('mkdir ' + outdir + '/' + 'fastas')
-
-
-    recs_list_by_hmm = extract_hits(hmmlist, fastalist, outdir, threads, best)
-
-    make_hitstable_df(recs_list_by_hmm, hmmlist, fastalist, outdir)
-
-    if not no_seqs:
-        print("Getting recs and writing to fasta...")
-
-        hmms_written = list(p.map(lambda hits:
-                                        write_recs(
-                                        #Actual list of recs
-                                        hits[0],
-                                        #Name of HMM to write (for fasta name)
-                                        hits[1],
-                                        outdir),
-                                        #List of recs to iterate over
-                                        recs_list_by_hmm))
-
-    print('boogie')
-    sys.exit(420)
+    return
 
 def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
