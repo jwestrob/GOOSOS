@@ -365,7 +365,9 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     c9 = "sort -k 3 -k 8,9g"
     print(c1)
     #subprocess.call(c1, shell=True)
+    c1 = ['sh', goosos_dir + '/hmmscan-parser.sh', '>', hmmoutfile_wpath.split(hmmoutfile)[0] + 'testout.parse'] 
     p1 = subprocess.Popen(c1, stdout=subprocess.PIPE, shell=True)
+    """
     print('passed c1')
     p2 = subprocess.Popen(c2, stdin=p1.stdout, stdout=subprocess.PIPE, shell=True)
     print('passed c2')
@@ -388,6 +390,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     with open(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmout.parse', 'w') as outfile:
         outfile.writelines(parse_outfile)
     #print
+    """
 
     return
 
