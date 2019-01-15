@@ -377,7 +377,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile):
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
     #Python, by default, splits the description at the end, causing dimension mismatch.
     #Let's get rid of the extra elements.
-    lines_filtered = list(map(lambda x: x[0:22], lines_filtered))
+    lines_filtered = list(map(lambda x: x[0:23], lines_filtered))
     #print(domtbl_header)
     #print(lines_filtered[0])
     #sys.exit()
