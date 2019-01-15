@@ -552,10 +552,9 @@ def test():
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
 
-    print(hmm_outfiles)
-    sys.exit()
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t') if x is not None else x, hmm_outfiles))
-    print(all_df_list[0])
+    all_df = pd.concat(all_df_list)
+    print(all_df.head())
 
     print("Good so far!")
 
