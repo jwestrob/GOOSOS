@@ -149,12 +149,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
     hits = pd.DataFrame(hitstable).T
     hits.columns = hmmlist
 
-    hits['id'] = fastalist
-    #Get columns of DF
-    cols = list(hits.columns.values)
-    #Move IDs column to first index, for to make it look pretty
-    cols.pop(cols.index('id'))
-    hits = hits[['id'] + cols]
+    hits.index = fastalist
 
     # Mark hits in table
     for hmm_recs, hmm in recs_by_hmm:
@@ -168,8 +163,8 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
             except:
                 print(genome_id)
                 print(type(genome_id))
-            print(hits[hits['id'] == genome_id])
-            hits[hits['id'] == genome_id][hmm] += 1
+
+            hits[genome_id][hmm] += 1
 
 
     #Write it to tsv in outdir without index (annoying)
