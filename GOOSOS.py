@@ -429,6 +429,7 @@ def test():
     print("Protlist:")
     print(protlist)
     print(protlist_wpath)
+    print(list(map(lambda path: path.split('/')[0], protlist_wpath)))
     sys.exit()
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
     print("End make_hitstable_df")
