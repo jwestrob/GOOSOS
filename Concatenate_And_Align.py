@@ -161,9 +161,13 @@ def main(args):
         #Get order of genomes
         genomes = hitstable.index.tolist()
 
+        print("Genomes:")
+        print(genomes)
+
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
-
+        print(genomes_passed_threshold)
+        sys.exit()
         fastadir = outdir + '/fastas'
         fastas_recs = list(map(lambda fastafile:
                       list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
@@ -183,7 +187,7 @@ def main(args):
 
         #throw_flags(hitstable, genomes_passed_threshold)
 
-        print(str(len(genomes_passed_threshold)) + " sequences passed the threshold for number of hits.")
+        print(str(len(genomes_passed_threshold)) + " genomes passed the threshold for number of hits.")
 
     print(genomes_passed_threshold)
     sys.exit()
