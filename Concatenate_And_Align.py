@@ -145,7 +145,7 @@ def main(args):
         #If you have aln_concat flag activated, this didn't happen earlier
         fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas', x), fastas))
 
-        if exclude is not none:
+        if exclude is not None:
             fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
                                                  fastas_wpath))
 
@@ -172,7 +172,7 @@ def main(args):
             #If you have aln_concat flag activated, this didn't happen earlier
             fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas', x), fastas))
 
-            if exclude is not none:
+            if exclude is not None:
                 fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
                                                     fastas_wpath))
 
