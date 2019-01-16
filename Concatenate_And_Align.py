@@ -157,6 +157,9 @@ def main(args):
 
         #Get hitstable
         hitstable = pd.read_csv(outdir + '/HITSTABLE.tsv', sep='\t')
+        hitstable.columns = 'id' + hitstable.columns.values
+        print(hitstable)
+        sys.exit()
 
         #Get order of genomes
         genomes = hitstable.index.tolist()
