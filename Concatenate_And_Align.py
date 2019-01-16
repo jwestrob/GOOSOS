@@ -164,6 +164,23 @@ def main(args):
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
 
+        fastadir = outdir + '/fastas'
+        fastas_recs = list(map(lambda fastafile:
+                      list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
+                       os.listdir(fastadir)))
+
+        for fasta in fastas_recs:
+            fasta = list(filter(lambda x: x.id.split('|')[0] in seqs_passed_threshold, fasta))
+
+
+        #Make subdirectory to store filtered fastas
+        goodseqs = fastadir + '/filtered_fastas'
+        if not os.path.exists(goodseqs):
+            os.mkdir(goodseqs)
+
+        for index, fasta in enumerate(os.listdir(fastadir)):
+            SeqIO.write(fastas_recs[index], os.path.join(goodseqs,fasta), 'fasta')
+
         #throw_flags(hitstable, genomes_passed_threshold)
 
         print(str(len(genomes_passed_threshold)) + " sequences passed the threshold for number of hits.")
@@ -180,11 +197,18 @@ def main(args):
             if exclude is not None:
                 fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
                                                     fastas_wpath))
+            print("Beginning alignments...")
+            if not os.path.exists(outdir + '/alignments'):
+                os.system('mkdir ' + outdir + '/alignments')
+            list(map(lambda x: align_fn(x, outdir, threads, inaccurate), fastas_wpath))
+        else:
+            filtered_fastas = os.listdir(goodseqs)
+            filtered_fastas_wpath = list(map(lambda x: os.path.join(goodseqs, x), filtered_fastas))
+            print("Beginning alignments...")
+            if not os.path.exists(outdir + '/alignments'):
+                os.system('mkdir ' + outdir + '/alignments')
+            list(map(lambda x: align_fn(x, outdir, threads, inaccurate), filtered_fastas_wpath))
 
-        print("Beginning alignments...")
-        if not os.path.exists(outdir + '/alignments'):
-            os.system('mkdir ' + outdir + '/alignments')
-        list(map(lambda x: align_fn(x, outdir, threads, inaccurate), fastas_wpath))
 
     alignments_dir = outdir + '/alignments'
     alignments = os.listdir(alignments_dir)
