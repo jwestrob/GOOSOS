@@ -93,9 +93,9 @@ def concatenate(alignments_recs, alignment_name, alignments_dir):
     fasta_extensions = ['.fa', '.faa', '.mfaa', '.fasta', '.fna']
     #Check if provided alignment name already contains fasta extension
     if any(ext in alignment_name for ext in fasta_extensions):
-        SeqIO.write(master_rec, alignments_dir + '/' + alignment_name, 'fasta')
+        SeqIO.write(master_aln, alignments_dir + '/' + alignment_name, 'fasta')
     else:
-        SeqIO.write(master_rec, alignments_dir + '/' + alignment_name + '.mfaa', 'fasta')
+        SeqIO.write(master_aln, alignments_dir + '/' + alignment_name + '.mfaa', 'fasta')
     return
 
 def make_partition_file(alignments_recs, alignments_dir):
