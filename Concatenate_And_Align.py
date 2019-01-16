@@ -10,10 +10,7 @@ import subprocess
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='So you ran GOOSOS and got some sorted fasta files. \
-    This script filters out genomes and genes that are below inclusion thresholds, \
-    aligns the sequences and concatenates them. Provides lots of histograms [outdir/figures].\
-    Also generates a partition file [outdir/partitions.nex] for use in phylogenomic analysis.')
+    description='So you ran GOOSOS and got some sorted fasta files. This script filters out genomes and genes that are below inclusion thresholds, aligns the sequences and concatenates them. Provides lots of histograms [outdir/figures]. Also generates a partition file [outdir/partitions.nex] for use in phylogenomic analysis.')
 
 parser.add_argument('-outdir', metavar='[GOOSOS output directory]', nargs=1,
                 help="Provide the path to the directory you specified for GOOSOS output.")
@@ -28,7 +25,7 @@ parser.add_argument('-just_concat', action='store_true', default=False,
 parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]', default=0.5,
                 help="Percentage threshold (as a number between 0 and 1) \
                 indicating how many hits out of the total a genome must have in \
-                order to be included in the final alignment. Default: 50% (0.5)")
+                order to be included in the final alignment. Default: 50 (0.5)")
 parser.add_argument('-inaccurate', action='store_true', default=False,
                 help="Use faster (less accurate) parameters for MAFFT.")
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
