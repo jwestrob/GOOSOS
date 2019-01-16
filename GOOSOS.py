@@ -31,7 +31,8 @@ def hmmpress(hmmlist_wpath, outdir):
     list_of_hmms = ' '.join(hmmlist_wpath)
 
     #Make folder to store hmmpress files in
-    os.mkdir(outdir + '/hmmpress')
+    if not os.path.exists(outdir + '/hmmpress'):
+        os.mkdir(outdir + '/hmmpress')
     for hmmfile in hmmlist_wpath:
         os.system('cp ' + hmmfile + ' ' + outdir + '/hmmpress')
     cwd = os.getcwd()
