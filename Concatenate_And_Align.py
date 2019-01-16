@@ -73,7 +73,7 @@ def sort(alignment, genomes):
         else:
             #Alignment doesn't contain this genome; provide blank sequence
             blank_seq = '-'*alignment_length
-            rec_to_append = SeqRecord(Seq(blank_seq), id=genomes[index])
+            rec_to_append = SeqRecord(Seq(blank_seq), id=genome)
             out_alignment.append(rec_to_append)
     return out_alignment
 
@@ -189,7 +189,7 @@ def main(args):
 
 
     #Does this still work properly if you skip steps?? Check this later
-    
+
     alignments_recs_sorted = list(map(lambda alignment: sort(alignment, genomes_passed_threshold),
                                                         alignments_recs))
 
