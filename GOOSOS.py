@@ -32,6 +32,8 @@ def hmmpress(hmmlist_wpath, outdir):
 
     #Make folder to store hmmpress files in
     os.mkdir(outdir + '/hmmpress')
+    for hmmfile in hmmlist_wpath:
+        os.system('cp ' + hmmfile + ' ' + outdir + '/hmmpress')
     cwd = os.getcwd()
 
     os.chdir(outdir)
@@ -359,6 +361,8 @@ def run_workflow():
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
     hmm_outfiles = []
+
+
 
 
 
