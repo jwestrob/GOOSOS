@@ -168,6 +168,8 @@ def main(args):
 
         print(str(len(genomes_passed_threshold)) + " sequences passed the threshold for number of hits.")
 
+    print(genomes_passed_threshold)
+    sys.exit()
 
     if not just_concat:
         if aln_concat:
@@ -189,6 +191,7 @@ def main(args):
     alignments_recs = list(map(lambda alignment:
                         list(SeqIO.parse(os.path.join(alignments_dir, alignment), 'fasta')),
                         alignments))
+
 
 
     #Does this still work properly if you skip steps?? Check this later
