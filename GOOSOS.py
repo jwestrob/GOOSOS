@@ -370,7 +370,8 @@ def run_workflow():
     if not already_scanned:
         if not ran_prodigal:
             #Make folder for proteins
-            os.mkdir(outdir + '/proteins')
+            if not os.path.exists(outdir + '/proteins'):
+                os.mkdir(outdir + '/proteins')
 
             #Predict genes for nucleotide fastas
             p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
