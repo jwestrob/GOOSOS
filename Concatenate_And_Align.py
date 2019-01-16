@@ -139,7 +139,7 @@ def main(args):
     exclude = args.exclude
     threads = args.threads
     inaccurate = args.inaccurate
-    alignment_name = args.aln_name
+    alignment_name = args.aln_name[0]
 
     if aln_concat and just_concat:
         print("You can't use the -aln_concat and -justconcat flags at the same time. See the README.")
