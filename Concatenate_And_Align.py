@@ -188,8 +188,6 @@ def main(args):
 
         print(str(len(genomes_passed_threshold)) + " genomes passed the threshold for number of hits.")
 
-    print(genomes_passed_threshold)
-    sys.exit()
 
     if not just_concat:
         if aln_concat:
