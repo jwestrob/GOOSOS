@@ -179,8 +179,8 @@ def main(args):
         if not os.path.exists(goodseqs):
             os.mkdir(goodseqs)
 
-        for index, fasta in enumerate(os.listdir(fastadir)):
-            SeqIO.write(fastas_recs[index], os.path.join(goodseqs,fasta), 'fasta')
+        for index, fastafile in enumerate(os.listdir(fastadir)):
+            SeqIO.write(fastas_recs[index], os.path.join(goodseqs,fastafile), 'fasta')
 
         #throw_flags(hitstable, genomes_passed_threshold)
 
