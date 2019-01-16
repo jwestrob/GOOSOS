@@ -12,8 +12,8 @@ import argparse
 parser = argparse.ArgumentParser(
     description='So you ran GOOSOS and got some sorted fasta files. \
     This script filters out genomes and genes that are below inclusion thresholds, \
-    aligns the sequences and concatenates them. Provides lots of histograms (outdir/figures).\
-    Also generates a partition file (outdir/partitions.nex) for use in phylogenomic analysis.')
+    aligns the sequences and concatenates them. Provides lots of histograms [outdir/figures].\
+    Also generates a partition file [outdir/partitions.nex] for use in phylogenomic analysis.')
 
 parser.add_argument('-outdir', metavar='[GOOSOS output directory]', nargs=1,
                 help="Provide the path to the directory you specified for GOOSOS output.")
