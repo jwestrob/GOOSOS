@@ -161,11 +161,6 @@ def main(args):
 
         #Get order of genomes
         genomes = hitstable['id'].tolist()
-        print(genomes)
-        sys.exit()
-
-        print("Genomes:")
-        print(genomes)
 
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
