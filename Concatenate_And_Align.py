@@ -166,9 +166,10 @@ def main(args):
                                                               genomes))
 
         fastadir = outdir + 'fastas'
+        fastas_only = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))
         fastas_recs = list(map(lambda fastafile:
                       list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
-                       os.listdir(fastadir)))
+                       fastas_only))
 
         for fasta in fastas_recs:
             fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
