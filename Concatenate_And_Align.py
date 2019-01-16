@@ -164,8 +164,7 @@ def main(args):
 
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
-        print(genomes_passed_threshold)
-        sys.exit()
+
         fastadir = outdir + '/fastas'
         fastas_recs = list(map(lambda fastafile:
                       list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
