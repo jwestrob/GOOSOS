@@ -160,6 +160,8 @@ def main(args):
 
         #Get order of genomes
         genomes = hitstable.index.tolist()
+        print(hitstable)
+        sys.exit()
 
         print("Genomes:")
         print(genomes)
