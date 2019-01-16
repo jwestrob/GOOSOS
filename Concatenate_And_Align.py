@@ -171,7 +171,7 @@ def main(args):
                        os.listdir(fastadir)))
 
         for fasta in fastas_recs:
-            fasta = list(filter(lambda x: x.id.split('|')[0] in seqs_passed_threshold, fasta))
+            fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
 
 
         #Make subdirectory to store filtered fastas
