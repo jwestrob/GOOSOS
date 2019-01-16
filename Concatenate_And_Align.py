@@ -10,7 +10,10 @@ import subprocess
 import argparse
 
 parser = argparse.ArgumentParser(
-    description='So you ran GOOSOS and got some sorted fasta files. This script filters out genomes and genes that are below inclusion thresholds, aligns the sequences and concatenates them. Provides lots of histograms [outdir/figures]. Also generates a partition file [outdir/partitions.nex] for use in phylogenomic analysis.')
+    description='So you ran GOOSOS and got some sorted fasta files. \
+    This script filters out genomes and genes that are below inclusion thresholds, \
+    aligns the sequences and concatenates them. Provides lots of histograms [outdir/figures]. \
+    Also generates a partition file [outdir/partitions.nex] for use in phylogenomic analysis.')
 
 parser.add_argument('-outdir', metavar='[GOOSOS output directory]', nargs=1,
                 help="Provide the path to the directory you specified for GOOSOS output.")
@@ -138,7 +141,7 @@ def main(args):
 
     if not aln_concat and not just_concat:
 
-        fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas/', x)))
+        fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas/', x), os.listdir(outdir + '/fastas')))
 
         if exclude is not none:
             fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
@@ -164,7 +167,7 @@ def main(args):
     if not just_concat:
         if aln_concat:
             #If you have aln_concat flag activated, this didn't happen earlier
-            fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas/', x)))
+            fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas/', x), os.listdir(outdir + '/fastas')))
 
             if exclude is not none:
                 fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
