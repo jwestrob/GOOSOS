@@ -73,7 +73,10 @@ def sort(alignment, genomes):
         else:
             #Alignment doesn't contain this genome; provide blank sequence
             blank_seq = '-'*alignment_length
-            rec_to_append = SeqRecord(Seq(blank_seq), id=genome)
+            try:
+                rec_to_append = SeqRecord(Seq(blank_seq), id=genome)
+            except:
+                print(genome)
             out_alignment.append(rec_to_append)
     return out_alignment
 
