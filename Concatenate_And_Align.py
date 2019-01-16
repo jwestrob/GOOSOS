@@ -92,6 +92,9 @@ def concatenate(alignments_recs, alignment_name, alignments_dir):
 
     fasta_extensions = ['.fa', '.faa', '.mfaa', '.fasta', '.fna']
     #Check if provided alignment name already contains fasta extension
+    print("alignments_dir: ", alignments_dir)
+    print("alignment_name: ", alignment_name)
+    sys.exit()
     if any(ext in alignment_name for ext in fasta_extensions):
         SeqIO.write(master_aln, alignments_dir + '/' + alignment_name, 'fasta')
     else:
