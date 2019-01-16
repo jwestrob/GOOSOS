@@ -116,7 +116,7 @@ def throw_flags(hitstable, genomes_passed_threshold):
     num_hits_by_hmm = hitstable.sum(axis=0)
     threshold = float(0.25)*float(len(hitstable))
     for element in num_hits_by_hmm:
-        if element < threshold:
+        if float(element) < threshold:
             print('abawaca4')
     #DO THIS LATER
     return
