@@ -161,7 +161,7 @@ def main(args):
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
 
-        throw_flags(hitstable, genomes_passed_threshold)
+        #throw_flags(hitstable, genomes_passed_threshold)
 
         print(str(len(genomes_passed_threshold)) + " sequences passed the threshold for number of hits.")
 
