@@ -161,7 +161,7 @@ def main(args):
 
         #Get order of genomes
         genomes = hitstable['id'].tolist()
-        print(hitstable[0])
+        print(genomes)
         sys.exit()
 
         print("Genomes:")
