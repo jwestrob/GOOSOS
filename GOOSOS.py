@@ -457,7 +457,7 @@ def run_workflow():
 
 
     prot_series = pd.Series(protlist)
-    prot_series.to_csv(outdir + '/genome_order.csv', sep=',', index=False, header=None)
+    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=None)
 
     print("Order of sorted alignments written to genome_order.txt.")
 
