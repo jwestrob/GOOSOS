@@ -187,7 +187,10 @@ def main(args):
                         list(SeqIO.parse(os.path.join(alignments_dir, alignment), 'fasta')),
                         alignments))
 
-    alignments_recs_sorted = list(map(lambda alignment: sort(alignment, seqs_passed_threshold),
+
+    #Does this still work properly if you skip steps?? Check this later
+    
+    alignments_recs_sorted = list(map(lambda alignment: sort(alignment, genomes_passed_threshold),
                                                         alignments_recs))
 
     lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs)]
