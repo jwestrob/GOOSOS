@@ -166,6 +166,7 @@ def main(args):
                                                               genomes))
 
         fastadir = outdir + 'fastas'
+        #You don't have to be loonelyyyyy at fastasonly.com
         fastas_only = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))
         fastas_recs = list(map(lambda fastafile:
                       list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
