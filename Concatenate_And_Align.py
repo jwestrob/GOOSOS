@@ -166,8 +166,9 @@ def main(args):
 
     if not just_concat:
         if aln_concat:
+            fastas = os.listdir(outdir + '/fastas')
             #If you have aln_concat flag activated, this didn't happen earlier
-            fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas/', x), os.listdir(outdir + '/fastas')))
+            fastas_wpath = list(map(lambda x: os.path.join(outdir + '/fastas', x), fastas))
 
             if exclude is not none:
                 fastas_wpath = list(filter(lambda x: x.split('/')[-1].split('.faa')[0] not in exclude,
