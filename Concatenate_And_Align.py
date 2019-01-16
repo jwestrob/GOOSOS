@@ -80,7 +80,7 @@ def sort(alignment, genomes):
             out_alignment.append(rec_to_append)
     return out_alignment
 
-def concatenate(alignments_recs_sorted, alignment_name, alignments_dir):
+def concatenate(alignments_recs, alignment_name, alignments_dir):
     master_aln = alignments_recs[0]
     master_ids = [rec.id for rec in master_aln]
     for index, rec in enumerate(master_aln):
