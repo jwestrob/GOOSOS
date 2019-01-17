@@ -26,7 +26,7 @@ parser.add_argument('-align', default=False, action='store_true', help='Align fa
 parser.add_argument('-accurate', default=False, action='store_true', help='If aligning, use accurate (SLOW) mafft parameters.')
 
 
-def hmmpress(hmmlist_wpath, outdir):
+def (hmmlist_wpath, outdir):
     #Concatenate all hmm files together and press them into a binary
     list_of_hmms = ' '.join(hmmlist_wpath)
 
@@ -305,7 +305,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                                 goodrow.hmm_end,
                                 goodrow.query_start,
                                 goodrow.query_end,
-                                'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
+                                'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
 
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
@@ -364,7 +364,18 @@ def run_workflow():
     hmm_outfiles = []
 
 
+    def run_hmms(fastafile):
+        fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+        # Make outdir for HMMs
+        if not os.path.exists(fastaoutdir):
+            os.system('mkdir ' + fastaoutdir)
+        #Make symbolic link
+        if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
+            os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+        hmm_outfiles.append([])
 
+        # Run all HMMs for fastafile
+        return run_hmmscan(fastafile, outdir, threshold)
 
 
 
@@ -393,18 +404,7 @@ def run_workflow():
         if not os.path.exists(outdir + '/hmmscan/'):
             os.system('mkdir ' + outdir + '/hmmscan/')
 
-        def run_hmms(fastafile):
-            fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
-            # Make outdir for HMMs
-            if not os.path.exists(fastaoutdir):
-                os.system('mkdir ' + fastaoutdir)
-            #Make symbolic link
-            if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
-                os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
-            hmm_outfiles.append([])
 
-            # Run all HMMs for fastafile
-            return run_hmmscan(fastafile, outdir, threshold)
 
         hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
@@ -417,6 +417,8 @@ def run_workflow():
         #Get list of protein files without full path
         protlist = list(map(lambda path: path.split('/')[-1].split('.fna')[0].split('.fa')[0].split('.fasta')[0],
                         protlist_wpath))
+
+        hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
 
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
