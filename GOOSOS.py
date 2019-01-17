@@ -325,6 +325,23 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
                 + outdir + '/' + alignments + '/' + fastafile_id + '_ALN.mfaa')
     return
 
+
+def fetch_outfiles(outdir, threshold, threads):
+    hmmscandir = os.path.join(outdir, 'hmmscan')
+    subdirectories = os.listdir(hmmscandir)
+    subdirectories_wpath = list(map(lambda dir: os.path.join(hmmscandir, dir), subdirectories))
+
+    def get_outfile(dir):
+        all_files = os.listdir(dir)
+        hmmoutfile = list(filter(lambda x: '_hmmsearch.out' in x, all_files))[0]
+        return hmmoutfile
+
+    hmmoutfiles = list(map(get_outfile, subdirectories_wpath))
+
+    parsed_hmm_outfiles = list(p.map(lambda outfile: parse_hmmdomtbl(outdir, outfile, threshold),
+                                     hmmoutfiles))
+    return parsed_hmm_outfiles
+
 def run_workflow():
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
@@ -361,7 +378,7 @@ def run_workflow():
     # Get list of all HMMs
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
-    hmm_outfiles = []
+    parsed_hmm_outfiles = []
 
 
     def run_hmms(fastafile):
@@ -412,7 +429,7 @@ def run_workflow():
 
 
         #Make sure you get rid of any Nones
-        hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
+        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
 
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
@@ -424,9 +441,9 @@ def run_workflow():
         protlist = list(map(lambda path: path.split('/')[-1].split('.fna')[0].split('.fa')[0].split('.fasta')[0],
                         protlist_wpath))
 
-        hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
-        
-    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
+        parsed_hmm_outfiles = fetch_outfiles(outdir, threshold, threads)
+
+    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
 
     all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
