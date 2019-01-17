@@ -26,7 +26,7 @@ parser.add_argument('-align', default=False, action='store_true', help='Align fa
 parser.add_argument('-accurate', default=False, action='store_true', help='If aligning, use accurate (SLOW) mafft parameters.')
 
 
-def (hmmlist_wpath, outdir):
+def hmmpress(hmmlist_wpath, outdir):
     #Concatenate all hmm files together and press them into a binary
     list_of_hmms = ' '.join(hmmlist_wpath)
 
