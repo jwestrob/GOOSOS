@@ -327,6 +327,7 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
 
 
 def fetch_outfiles(outdir, threshold, threads):
+    p = Pool(threads)
     hmmscandir = os.path.join(outdir, 'hmmscan')
     subdirectories = os.listdir(hmmscandir)
     subdirectories_wpath = list(map(lambda dir: os.path.join(hmmscandir, dir), subdirectories))
