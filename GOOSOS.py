@@ -365,14 +365,20 @@ def run_workflow():
 
 
     def run_hmms(fastafile):
+
         fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+
+        if not os.path.exists(fastaoutdir):
+            genome_id = fastafile.split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+            print("Missing output directory for ", genome_id)
+            print("Please check with Jacob unless this was done on purpose.")
+            return
         # Make outdir for HMMs
         if not os.path.exists(fastaoutdir):
             os.system('mkdir ' + fastaoutdir)
         #Make symbolic link
         if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
             os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
-        hmm_outfiles.append([])
 
         # Run all HMMs for fastafile
         return run_hmmscan(fastafile, outdir, threshold)
@@ -405,8 +411,8 @@ def run_workflow():
             os.system('mkdir ' + outdir + '/hmmscan/')
 
 
-
-        hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
+        #Make sure you get rid of any Nones
+        hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
 
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
@@ -418,8 +424,8 @@ def run_workflow():
         protlist = list(map(lambda path: path.split('/')[-1].split('.fna')[0].split('.fa')[0].split('.fasta')[0],
                         protlist_wpath))
 
-        hmm_outfiles = list(p.map(run_hmms, protlist_wpath))
-
+        hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
+        
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
 
