@@ -424,7 +424,7 @@ def run_workflow():
 
 
         #Make sure you get rid of any Nones
-        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(run_hmms, protlist_wpath))))
+        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold), protlist_wpath))))
 
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
