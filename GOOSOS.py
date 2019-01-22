@@ -343,6 +343,21 @@ def fetch_outfiles(outdir, threshold, threads):
                                      hmmoutfiles))
     return parsed_hmm_outfiles
 
+
+def run_hmms(fastafile, outdir, threshold):
+
+    fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+
+    # Make outdir for HMMs
+    if not os.path.exists(fastaoutdir):
+        os.system('mkdir ' + fastaoutdir)
+    #Make symbolic link
+    if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
+        os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+
+    # Run all HMMs for fastafile
+    return run_hmmscan(fastafile, outdir, threshold)
+
 def run_workflow():
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
@@ -380,27 +395,6 @@ def run_workflow():
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
     parsed_hmm_outfiles = []
-
-
-    def run_hmms(fastafile):
-
-        fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
-
-        if not os.path.exists(fastaoutdir):
-            genome_id = fastafile.split('.fna')[0].split('.fasta')[0].split('.fa')[0]
-            print("Missing output directory for ", genome_id)
-            print("Please check with Jacob unless this was done on purpose.")
-            return
-        # Make outdir for HMMs
-        if not os.path.exists(fastaoutdir):
-            os.system('mkdir ' + fastaoutdir)
-        #Make symbolic link
-        if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
-            os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
-
-        # Run all HMMs for fastafile
-        return run_hmmscan(fastafile, outdir, threshold)
-
 
 
     if not already_scanned:
