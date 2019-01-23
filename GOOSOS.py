@@ -309,7 +309,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
-    orf_df = orf_df[orf_df['overall_evalue'] <= threshold]
+    orf_df = orf_df[orf_df['overall_evalue'].astype(float) <= threshold]
 
     orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
