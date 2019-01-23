@@ -185,7 +185,13 @@ def run_prodigal(fastafile_wpath, outdir):
     #                        fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
     os.system('prodigal -i '+ fastafile_wpath + ' -a ' + outdir + '/proteins/' +
                             fastafile_wpath.split('/')[-1] + '.faa -m -p single > /dev/null 2>&1')
-    print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
+
+    protdir = outdir + '/proteins/'
+    if os.path.getsize(protdir + fastafile_wpath.split('/')[-1] + '.faa') == 0:
+        print('No genes predicted for ' + fastafile_wpath.split('/')[-1])
+        os.system('rm ' + protdir + fastafile_wpath.split('/')[-1] + '.faa')
+    else:
+        print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
     return
 
 def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
