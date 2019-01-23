@@ -67,8 +67,8 @@ def run_hmmscan(protfile, outdir, threshold):
     genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw -E ' \
-            + str(threshold) + ' --cpu ' + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+    cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
+            + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     #print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
@@ -309,6 +309,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
+    orf_df = orf_df[orf_df['evalue'] <= threshold]
 
     orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
