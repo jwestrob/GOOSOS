@@ -232,8 +232,13 @@ def main(args):
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, genomes_passed_threshold),
                                                             alignments_recs))
     else:
-        #It's assumed that you've filtered at this point;
-        all_ids = list(set([rec.id for rec in alignment for alignment in alignments_recs]))
+        #It's assumed that you've filtered at this point
+        redundant_ids = []
+        for alignment in alignments_recs:
+            for rec in alignment:
+                redundant_ids.append(rec.id)
+
+        all_ids = list(set(redundant_ids))
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
                                                             alignments_recs))
 
