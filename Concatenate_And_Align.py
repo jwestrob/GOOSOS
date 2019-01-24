@@ -24,8 +24,8 @@ parser.add_argument('-exclude', metavar='[HMMs to exclude]', nargs='*', default=
 parser.add_argument('-aln_concat', action='store_true', default=False,
                 help="For if you already did filtering on your fastas (assumed to be in outdir/fastas) and just want to align/concatenate.")
 parser.add_argument('-just_concat', action='store_true', default=False,
-                help="For if you just want to concatenate some alignments (assumed to be in outdir/alignments).")
-parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]', default=0.5,
+                help="For if you just want to concatenate some alignments (assumed to be in outdir/alignments). DOES NOT FILTER BASED ON THRESHOLD!")
+parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]', default=None,
                 help="Percentage threshold (as a number between 0 and 1) \
                 indicating how many hits out of the total a genome must have in \
                 order to be included in the final alignment. Default: 50 (0.5)")
@@ -141,6 +141,10 @@ def main(args):
     inaccurate = args.inaccurate
     alignment_name = args.aln_name[0]
 
+    if threshold is not None and just_concat == True:
+        print("Since you specified the -just_concat flag, the threshold will not be used to filter.")
+        print("This is assumed to have been done already in a previous run.")
+
     if aln_concat and just_concat:
         print("You can't use the -aln_concat and -justconcat flags at the same time. See the README.")
         sys.exit()
@@ -213,7 +217,6 @@ def main(args):
                 os.system('mkdir ' + outdir + '/alignments')
             list(map(lambda x: align_fn(x, outdir, threads, inaccurate), filtered_fastas_wpath))
 
-
     alignments_dir = outdir + '/alignments'
     alignments = os.listdir(alignments_dir)
     alignments_recs = list(map(lambda alignment:
@@ -223,9 +226,16 @@ def main(args):
 
 
     #Does this still work properly if you skip steps?? Check this later
+    #Of course it doesn't lmao good job past jacob
 
-    alignments_recs_sorted = list(map(lambda alignment: sort(alignment, genomes_passed_threshold),
-                                                        alignments_recs))
+    if not just_concat:
+        alignments_recs_sorted = list(map(lambda alignment: sort(alignment, genomes_passed_threshold),
+                                                            alignments_recs))
+    else:
+        #It's assumed that you've filtered at this point;
+        all_ids = list(set([rec.id for rec in alignment for alignment in alignments_recs]))
+        alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
+                                                            alignments_recs))
 
     lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs)]
     print("Your concatenated alignment is " + str(sum(lengths)) + ' characters long. Congratulations')
