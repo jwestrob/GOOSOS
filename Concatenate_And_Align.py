@@ -233,10 +233,10 @@ def main(args):
         redundant_ids = []
         for alignment in alignments_recs:
             for rec in alignment:
-                redundant_ids.append(rec.id)
+                redundant_ids.append(rec.id.split('|')[0])
 
         all_ids = list(set(redundant_ids))
-        print(all_ids)
+        print(all_ids1)
         print(len(all_ids))
         sys.exit()
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
