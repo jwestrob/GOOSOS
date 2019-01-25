@@ -236,6 +236,7 @@ def main(args):
                 redundant_ids.append(rec.id)
 
         all_ids = list(set(redundant_ids))
+        print(all_ids)
         print(len(all_ids))
         sys.exit()
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
