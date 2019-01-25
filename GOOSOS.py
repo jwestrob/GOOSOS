@@ -307,6 +307,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                                 goodrow.orf_id,
                                 goodrow.hmm_length,
                                 goodrow.evalue,
+                                goodrow.c_evalue,
                                 goodrow.hmm_start,
                                 goodrow.hmm_end,
                                 goodrow.query_start,

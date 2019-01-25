@@ -107,7 +107,7 @@ def make_partition_file(alignments_recs, alignments_dir):
     position = 1
     for aln_num, alignment in enumerate(alignments_recs):
         line = '\tcharset part' + str(aln_num) +  ' = ' + str(int(position)) + '-' + str(int(position) + len(alignment[0].seq)) + ';\n'
-        print(line)
+        #print(line)
         position = int(position) + len(alignment[0].seq)
         outfile_list.append(line)
     outfile_list.append('end;')
@@ -236,6 +236,8 @@ def main(args):
                 redundant_ids.append(rec.id)
 
         all_ids = list(set(redundant_ids))
+        print(len(all_ids))
+        sys.exit()
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
                                                             alignments_recs))
 

@@ -19,7 +19,7 @@ This script yields two tab-separated dataframe-style output files: `all_hits_eva
 
 - `all_hits_evalues_df.tsv` has a list of hits organized by genome of origin, along with ORF numbers indicating the contig/scaffold they originated from in the original nucleotide data, so that you can check for synteny among your hits. This is intended for ribosomal protein analyses, but might hopefully be useful when looking at other proteins too. (Trying to find an operon, perhaps?) This dataframe also contains helpful e-value information on your hits, so that you can determine a sensible cutoff value if you haven't yet determined one (or don't want to just pick a threshold before looking at your data).
 
-    - Wondering what all this nonsense about domain 1 and 2 is? Well, lots of hits (at least for the ribosomal sequences I've been looking at) have two different domains, so I've included information on both of those domains when relevant. I am not particularly interested in cases where you might have more than two domain hits for a single ORF, but if you are and you're concerned about this let me know I guess. I can adapt this dataframe to include potential relevant information. If you want to check whether there are ORFs with >2 hits, look at the HMMscan outfiles (output/hmmscan/). 
+    - Wondering what all this nonsense about domain 1 and 2 is? Well, lots of hits (at least for the ribosomal sequences I've been looking at) have two different domains, so I've included information on both of those domains when relevant. I am not particularly interested in cases where you might have more than two domain hits for a single ORF, but if you are and you're concerned about this let me know I guess. I can adapt this dataframe to include potential relevant information. If you want to check whether there are ORFs with >2 hits, look at the HMMscan outfiles (output/hmmscan/).
 
 - `HITSTABLE.tsv` indicates how many hits for each HMM are in each genome. I use this for quality control once I've done all my scanning- for instance, you might not want to include genomes that have 2 distinct hits for each of your ribosomal HMMs when doing phylogenomic analyses. (Looking at you, SAR202 megabins)
 
@@ -37,9 +37,13 @@ So glad to see the enthusiasm. Here's a list. I know you love those.
 
 - If you don't want to write seqs and only want a hits table (-no_seqs) : Saves time if you're trying to calibrate your e-value threshold.
 
-- Wanna align your sequences? Just put `-align` in your arguments. If you'd like to use the more accurate parameters for MAFFT, which I recommend, add `-align -accurate`. This will take longer, and doesn't scale particularly well with datasets of increasing size, but if you're doing phylogenomic analysis post-alignment, I highly recommend it.
-
 This list will be updated iteratively as I put more stuff in here.
+
+# But there's another program in here! What the heck dude?
+
+This additional program (`Concatenate_And_Align.py`) takes the fastas you generated with GOOSOS, filters out genomes that don't have enough sequences (as determined by the `-threshold` flag), aligns them, sorts them, concatenates the alignments, and yields a partition file (`partitions.nex`) that you can use when building your phylogenetic tree.
+
+
 
 # What are the dependencies?
 
