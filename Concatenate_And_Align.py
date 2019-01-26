@@ -101,9 +101,9 @@ def concatenate(alignments_recs, alignment_name, alignments_dir):
 def make_partition_file(alignments_recs, alignments_dir):
     outfile_list = []
     outfile_list.append('#nexus\n')
-    print('#nexus')
+    #print('#nexus')
     outfile_list.append('begin sets;\n')
-    print('begin sets;')
+    #print('begin sets;')
     position = 1
     for aln_num, alignment in enumerate(alignments_recs):
         line = '\tcharset part' + str(aln_num) +  ' = ' + str(int(position)) + '-' + str(int(position) + len(alignment[0].seq)) + ';\n'

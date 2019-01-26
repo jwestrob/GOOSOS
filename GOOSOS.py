@@ -312,7 +312,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                                 goodrow.hmm_end,
                                 goodrow.query_start,
                                 goodrow.query_end,
-                                'NaN', 'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
+                                'NaN', 'NaN', 'NaN', 'NaN', 'NaN'])
 
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
