@@ -40,13 +40,11 @@ def hmmpress(hmmlist_wpath, outdir):
     #Since hmmscan labels every hit with whatever's in that field
     for hmmfile in hmmlist_wpath:
         rename(hmmfile, outdir + '/hmmpress')
-    cwd = os.getcwd()
+    hmmpressdir = outdir + '/hmmpress/'
 
-    os.chdir(outdir)
-    os.system('cat ' + list_of_hmms + ' > concatenated_hmms.hmm')
+    os.system('cat ' + hmmpressdir + '* > ' + hmmpressdir + 'concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
-    os.system('mv ' + outdir + '/concatenated_hmms.* ' + outdir + '/hmmpress/')
 
     os.chdir(cwd)
     return
