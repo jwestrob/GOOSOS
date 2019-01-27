@@ -42,6 +42,8 @@ def hmmpress(hmmlist_wpath, outdir):
         rename(hmmfile, outdir + '/hmmpress')
     hmmpressdir = outdir + '/hmmpress/'
 
+    print('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
+
     os.system('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
 
     os.system('hmmpress concatenated_hmms.hmm')
