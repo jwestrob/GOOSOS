@@ -39,7 +39,9 @@ def hmmpress(hmmlist_wpath, outdir):
     #Rename the NAME field on each HMM file to be consistent with filename
     #Since hmmscan labels every hit with whatever's in that field
     for hmmfile in hmmlist_wpath:
-        rename(hmmfile, outdir + '/hmmpress')
+        rename(hmmfile, outdir + '/hmmpress/')
+
+
     hmmpressdir = outdir + '/hmmpress/'
 
     print('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
