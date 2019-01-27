@@ -425,8 +425,8 @@ def main():
     # Get list of all HMMs
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
-        #Generate binary files for hmmsearch
-        hmmpress(hmmlist_wpath, outdir)
+    #Generate binary files for hmmsearch
+    hmmpress(hmmlist_wpath, outdir)
 
     parsed_hmm_outfiles = []
 
