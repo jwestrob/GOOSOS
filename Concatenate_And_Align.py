@@ -243,11 +243,12 @@ def main(args):
     lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs)]
     print("Your concatenated alignment is " + str(sum(lengths)) + ' characters long. Congratulations')
 
+    #Make partition file for phylogenomic analysis
+    make_partition_file(alignments_recs_sorted, alignments_dir)
+
     #Concatenate and make final alignment
     concatenate(alignments_recs_sorted, alignment_name, alignments_dir)
 
-    #Make partition file for phylogenomic analysis
-    make_partition_file(alignments_recs_sorted, alignments_dir)
 
 
 if __name__ == "__main__":

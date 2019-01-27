@@ -35,8 +35,11 @@ def hmmpress(hmmlist_wpath, outdir):
     #Make folder to store hmmpress files in
     if not os.path.exists(outdir + '/hmmpress'):
         os.mkdir(outdir + '/hmmpress')
+
+    #Rename the NAME field on each HMM file to be consistent with filename
+    #Since hmmscan labels every hit with whatever's in that field
     for hmmfile in hmmlist_wpath:
-        os.system('cp ' + hmmfile + ' ' + outdir + '/hmmpress')
+        rename(hmmfile, outdir + '/hmmpress')
     cwd = os.getcwd()
 
     os.chdir(outdir)
@@ -46,6 +49,17 @@ def hmmpress(hmmlist_wpath, outdir):
     os.system('mv ' + outdir + '/concatenated_hmms.* ' + outdir + '/hmmpress/')
 
     os.chdir(cwd)
+    return
+
+def rename(hmmfile, hmmdir):
+    with open(hmmfile, 'r') as f:
+        lines = f.readlines()
+    name_line = lines[1].split()
+    name_line[1] = hmmfile.split('.hmm')[0].split('/')[-1]
+    lines[1] = ('\t').join(name_line)
+    with open(hmmdir + hmmfile.split('/')[-1], 'w') as f:
+        for item in lines:
+            f.write("%s\n" % item)
     return
 
 def run_hmmsearch(protfile, hmmfile, outdir, threshold):
@@ -411,6 +425,9 @@ def main():
     # Get list of all HMMs
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
 
+        #Generate binary files for hmmsearch
+        hmmpress(hmmlist_wpath, outdir)
+
     parsed_hmm_outfiles = []
 
 
@@ -423,8 +440,7 @@ def main():
             #Predict genes for nucleotide fastas
             p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
-        #Generate binary files for hmmsearch
-        hmmpress(hmmlist_wpath, outdir)
+
 
         if not have_proteins:
             protdir = outdir + '/proteins'
