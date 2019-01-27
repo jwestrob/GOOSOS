@@ -48,7 +48,7 @@ def hmmpress(hmmlist_wpath, outdir):
 
     os.system('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
 
-    os.system('hmmpress concatenated_hmms.hmm')
+    os.system('hmmpress ' + hmmpressdir + 'concatenated_hmms.hmm')
 
     return
 
