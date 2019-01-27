@@ -46,7 +46,6 @@ def hmmpress(hmmlist_wpath, outdir):
 
     os.system('hmmpress concatenated_hmms.hmm')
 
-    os.chdir(cwd)
     return
 
 def rename(hmmfile, hmmdir):
