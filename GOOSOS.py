@@ -13,6 +13,8 @@ parser = argparse.ArgumentParser(
     description='Given a directory of protein fasta files, extract the hits for each HMM for each bin; get multifasta of each protein')
 parser.add_argument('-nucdir', metavar='[NUCLEOTIDE FASTA DIRECTORY]',
                     help='Directory containing nucleotide sequences.')
+parser.add_argument('-protdir', metavar='[PRODIGAL PROTEIN FASTA DIRECTORY]',
+                    help='Directory of prodigal output for your fastas in amino acid format.', default=None)
 parser.add_argument('-hmmdir', metavar='[HMM DIRECTORY]', help="Directory containing HMM files to scan with")
 parser.add_argument('-outdir', metavar='[Output Directory]', default='output', help="Directory to store output files")
 parser.add_argument('-evalue', metavar='[EVALUE THRESHOLD]', default=0.01,
@@ -366,9 +368,13 @@ def run_hmms(fastafile, outdir, threshold):
     # Run all HMMs for fastafile
     return run_hmmscan(fastafile, outdir, threshold)
 
-def run_workflow():
+def main():
     args = parser.parse_args()
     nucdir = str(Path(args.nucdir).absolute())
+    if args.protdir is not None:
+        prodigaldir = str(Path(args.protdir).absolute())
+    else:
+        prodigaldir = None
     hmmdir = str(Path(args.hmmdir).absolute())
     outdir = str(args.outdir)
     threshold = float(args.evalue)
@@ -381,6 +387,8 @@ def run_workflow():
     accurate = args.accurate
 
 
+    have_proteins = True if prodigaldir is not None else False
+
     p = Pool(threads)
 
     # Make output directory
@@ -390,8 +398,9 @@ def run_workflow():
     else:
         outdir = str(Path(outdir).absolute())
 
-    # Get list of paths of all fastas
-    fastalist_wpath = list(map(lambda file: os.path.join(nucdir, file), os.listdir(nucdir)))
+    if not have_proteins:
+        # Get list of paths of all fastas
+        fastalist_wpath = list(map(lambda file: os.path.join(nucdir, file), os.listdir(nucdir)))
 
     # Get list of all fastas
     #fastalist = list(map(lambda file: file.split('.f')[0], os.listdir(fastadir)))
@@ -406,7 +415,7 @@ def run_workflow():
 
 
     if not already_scanned:
-        if not ran_prodigal:
+        if not ran_prodigal and not have_proteins:
             #Make folder for proteins
             if not os.path.exists(outdir + '/proteins'):
                 os.mkdir(outdir + '/proteins')
@@ -414,11 +423,13 @@ def run_workflow():
             #Predict genes for nucleotide fastas
             p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
-            #Generate binary files for hmmsearch
-            hmmpress(hmmlist_wpath, outdir)
+        #Generate binary files for hmmsearch
+        hmmpress(hmmlist_wpath, outdir)
 
-
-        protdir = outdir + '/proteins'
+        if not have_proteins:
+            protdir = outdir + '/proteins'
+        else:
+            protdir = prodigaldir
 
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
@@ -498,4 +509,4 @@ def run_workflow():
     print("You did it!")
 
 if __name__ == "__main__":
-    run_workflow()
+    main()
