@@ -480,10 +480,6 @@ def main():
 
         all_df = pd.read_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t')
 
-    all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
-    all_df = pd.concat(all_df_list, sort=False)
-
-    all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
 
     recs_list_by_hmm = extract_hits(all_df, threads, outdir)
 
