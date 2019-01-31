@@ -463,6 +463,11 @@ def main():
         #Make sure you get rid of any Nones
         parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold), protlist_wpath))))
 
+        all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
+        all_df = pd.concat(all_df_list, sort=False)
+
+        all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
+
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
         protdir = outdir + '/proteins'
@@ -473,7 +478,7 @@ def main():
         protlist = list(map(lambda path: path.split('/')[-1].split('.fna')[0].split('.fa')[0].split('.fasta')[0],
                         protlist_wpath))
 
-        parsed_hmm_outfiles = fetch_outfiles(outdir, threshold, threads)
+        all_df = pd.read_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t')
 
     all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
     all_df = pd.concat(all_df_list, sort=False)
