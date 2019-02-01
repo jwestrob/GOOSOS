@@ -193,6 +193,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     Takes output file from HMMscan (--domtblout), parses it, and yields a
     genome-specific dataframe of each hit (above the evalue threshold) for each
     domain.
+    Now contains bitscore information as well.
     """
 
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
