@@ -99,30 +99,6 @@ def run_hmmscan(protfile, outdir, threshold):
     return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold)
 
 
-def extract_hits_by_outfile(dir, infile):
-    hits = []
-    e_values = []
-    with open(dir + '/' + infile[0], 'r') as handle:
-        for record in SearchIO.parse(handle, 'hmmer3-text'):
-            hits.append(list(record))
-
-    try:
-        hits = hits[0]
-    except:
-        return
-
-    good_hits = [hit._id for hit in hits]
-    e_values = [hit.evalue for hit in hits]
-    # If you have more than one hit, go with the hit that has the best e-value
-    if len(good_hits) > 1:
-        return good_hits[e_values.index(min(e_values))]
-    else:
-        try:
-            return good_hits[0]
-        except:
-            return
-
-
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_dir = outdir + '/hmmscan/' + genome_id + '/'
     protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
@@ -230,27 +206,27 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                     'hmm_to',  'ali_from', 'ali_to',  'env_from', 'env_to',  'mean_posterior', 'description of target']
 
     desired_header = ['family_hmm', 'hmm_length', 'orf_id',
-                      'query_length', 'evalue', 'hmm_start',
+                      'query_length', 'bitscore', 'evalue', 'hmm_start',
                       'hmm_end', 'query_start', 'query_end']
 
     #Remove all lines with '#' beginning character
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
     if len(lines_filtered) == 0:
         print("No hits for " + genome_id)
-        orflist_header = ['family_hmm', 'hmm_length', 'orf_id', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+        orflist_header = ['family_hmm', 'hmm_length', 'orf_id', 'overall_bitscore', 'overall_evalue', 'dom1_evalue', 'dom1_hmmstart',
                           'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                           'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
         empty_df = pd.DataFrame(columns = orflist_header)
         empty_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
         return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
+
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
+
     #Python, by default, splits the description at the end, causing dimension mismatch.
     #Let's get rid of the extra elements.
     lines_filtered = list(map(lambda x: x[0:23], lines_filtered))
-    #print(domtbl_header)
-    #print(lines_filtered[0])
-    #sys.exit()
+
     #Make pandas DF to store lines, then add column names
     lines_df = pd.DataFrame(lines_filtered, columns=domtbl_header)
 
@@ -264,6 +240,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     goodheader_df['hmm_length'] = lines_df['tlen']
     goodheader_df['orf_id'] = lines_df['query name']
     goodheader_df['query_length'] = lines_df['qlen']
+    goodheader_df['bitscore'] = lines_df['full_score']
     goodheader_df['evalue'] = lines_df['E-value']
     goodheader_df['c_evalue'] = lines_df['c-Evalue']
     goodheader_df['hmm_start'] = lines_df['hmm_from']
@@ -276,7 +253,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     #print(unique_orfs)
 
     orflist = []
-    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'overall_bitscore', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
                       'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_cevalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
@@ -300,6 +277,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                                 genome_id,
                                 goodrow.orf_id,
                                 goodrow.hmm_length,
+                                goodrow.bitscore,
                                 goodrow.evalue,
                                 goodrow.c_evalue,
                                 goodrow.hmm_start,
@@ -323,6 +301,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
                                 genome_id,
                                 goodrow.orf_id,
                                 goodrow.hmm_length,
+                                goodrow.bitscore,
                                 goodrow.evalue,
                                 goodrow.c_evalue,
                                 goodrow.hmm_start,
