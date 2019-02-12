@@ -92,6 +92,8 @@ def concatenate(alignments_recs, alignment_name, alignments_dir):
 
     fasta_extensions = ['.fa', '.faa', '.mfaa', '.fasta', '.fna']
 
+    
+    #Check to see if your filename ends with a .fa extension (or similar); if so just write the file as-is, else add extension
     if any(ext in alignment_name for ext in fasta_extensions):
         SeqIO.write(master_aln, alignments_dir + '/' + alignment_name, 'fasta')
     else:
