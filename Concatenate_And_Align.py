@@ -84,7 +84,7 @@ def concatenate(alignments_recs, alignment_name, alignments_dir):
     master_aln = alignments_recs[0]
     master_ids = [rec.id for rec in master_aln]
     for index, rec in enumerate(master_aln):
-        for alignment in alignments_recs:
+        for alignment in alignments_recs[1:]:
             master_aln[index].seq += alignment[index].seq
 
     for alignment in master_aln:
