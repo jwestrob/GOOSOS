@@ -115,6 +115,7 @@ def extract_hits_by_hmm(red_df, threads, outdir):
 
     #Make list of genome_id / orf pairs
     id_orf_list = red_df[['genome_id', 'orf_id']].values.tolist()
+    id_orf_list['genome_id'] = id_orf_list['genome_id'].apply(lambda x: str(x))
 
 
     recs = list(p2.map(lambda id_orf: get_rec_for_hit(id_orf[0], id_orf[1], outdir), id_orf_list))
@@ -124,6 +125,9 @@ def extract_hits_by_hmm(red_df, threads, outdir):
 def extract_hits(all_df, threads, outdir):
     #List of recs (value to return)
     recs_by_hmm = []
+
+    #Make sure that you extract the best hit
+    dedupe_df = dedupe()
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
@@ -314,6 +318,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
     orf_df = orf_df[orf_df['overall_evalue'].astype(float) <= threshold]
+
 
     orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
