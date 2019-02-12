@@ -100,7 +100,7 @@ def run_hmmscan(protfile, outdir, threshold):
 
 
 def get_rec_for_hit(genome_id, orf, outdir):
-    genome_dir = outdir + '/hmmscan/' + genome_id + '/'
+    genome_dir = outdir + '/hmmscan/' + str(genome_id) + '/'
     protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
@@ -113,16 +113,8 @@ def extract_hits_by_hmm(red_df, threads, outdir):
     print("Extracting hits for " + red_df.iloc[0].family_hmm)
     p2 = Pool(threads)
 
-
-    #Genome IDs that are comprised entirely of numbers are parsed by python as
-    #ints no matter what you do. Thanks python. Love ya bud
-    red_df['orf_id'] == red_df['orf_id'].apply(lambda x: str(x))
-
-
     #Make list of genome_id / orf pairs
     id_orf_list = red_df[['genome_id', 'orf_id']].values.tolist()
-
-
 
     recs = list(p2.map(lambda id_orf: get_rec_for_hit(id_orf[0], id_orf[1], outdir), id_orf_list))
 
@@ -188,7 +180,7 @@ def extract_hits(all_df, threads, outdir):
     recs_by_hmm = []
 
     #Make sure that you extract the best hit
-    dedupe_df = dedupe(all_df)
+    #dedupe_df = dedupe(all_df)
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
