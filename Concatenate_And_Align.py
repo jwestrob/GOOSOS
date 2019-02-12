@@ -217,7 +217,7 @@ def main(args):
             list(map(lambda x: align_fn(x, outdir, threads, inaccurate), filtered_fastas_wpath))
 
     alignments_dir = outdir + '/alignments'
-    alignments = os.listdir(alignments_dir)
+    alignments = list(filter(lambda x: 'ALN' in x, os.listdir(alignments_dir)))
     alignments_recs = list(map(lambda alignment:
                         list(SeqIO.parse(os.path.join(alignments_dir, alignment), 'fasta')),
                         alignments))
@@ -242,7 +242,7 @@ def main(args):
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
                                                             alignments_recs))
 
-    lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs)]
+    lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs_sorted)]
     print("Your concatenated alignment is " + str(sum(lengths)) + ' characters long. Congratulations')
 
     #Make partition file for phylogenomic analysis
