@@ -113,9 +113,15 @@ def extract_hits_by_hmm(red_df, threads, outdir):
     print("Extracting hits for " + red_df.iloc[0].family_hmm)
     p2 = Pool(threads)
 
+
+    #Genome IDs that are comprised entirely of numbers are parsed by python as
+    #ints no matter what you do. Thanks python. Love ya bud
+    red_df['orf_id'] == red_df['orf_id'].apply(lambda x: str(x))
+
+
     #Make list of genome_id / orf pairs
     id_orf_list = red_df[['genome_id', 'orf_id']].values.tolist()
-    id_orf_list['genome_id'] = id_orf_list['genome_id'].apply(lambda x: str(x))
+
 
 
     recs = list(p2.map(lambda id_orf: get_rec_for_hit(id_orf[0], id_orf[1], outdir), id_orf_list))
