@@ -63,24 +63,7 @@ def rename(hmmfile, hmmdir):
             f.write("%s\n" % item)
     return
 
-def run_hmmsearch(protfile, hmmfile, outdir, threshold):
-    protein_id = protfile.split('/')[-1].split('.faa')[0]
-
-    #print(protein_id, hmmfile)
-    cmd = 'hmmsearch -o ' + outdir + '/hmmsearch/' + protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + \
-          '_hmmsearch.out  --notextw -E ' + str(threshold) + ' --cpu ' + str(1) + ' ' + hmmfile + \
-          ' ' + protfile
-    #print(cmd)
-    result = subprocess.getstatusoutput(cmd)
-    if result[0] != 0:
-        print('HMMsearch error (check for empty sequences in your protein FASTAs)')
-        print('protein_id: ', protein_id)
-        #print('hmmfile: ', hmmfile)
-        sys.exit()
-    #print(result)
-    return protein_id + '_' + hmmfile.split('/')[-1].split('.hmm')[0] + '_hmmsearch.out'
-
-def run_hmmscan(protfile, outdir, threshold):
+def run_hmmscan(protfile, outdir, threshold, best):
     genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
 
     #print(protein_id, hmmfile)
@@ -96,7 +79,7 @@ def run_hmmscan(protfile, outdir, threshold):
         sys.exit()
     #print(result)
     #Parse file with awk/perl nonsense; generate .parse file
-    return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold)
+    return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
 
 
 def get_rec_for_hit(genome_id, orf, outdir):
@@ -245,7 +228,7 @@ def run_prodigal(fastafile_wpath, outdir):
         print('Genes predicted for ' + fastafile_wpath.split('/')[-1])
     return
 
-def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
+def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
     """
     Takes output file from HMMscan (--domtblout), parses it, and yields a
@@ -318,7 +301,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     for orf in unique_orfs:
         red_df = goodheader_df[goodheader_df['orf_id'] == orf]
 
-        #For the unlikely scenario where you have more than one HMM hit on a single ORF
+        #For the unlikely scenario where you have more than one HMM hit on a single ORF xfor ONE HMM
         if len(red_df['family_hmm'].unique()) > 1:
             #You want ascending=True because you want the smallest values first
             sorted_red = red_df.sort_values(by='evalue', ascending=True)
@@ -373,6 +356,23 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold):
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
     orf_df = orf_df[orf_df['overall_evalue'].astype(float) <= threshold]
 
+    #Great. Now let's deduplicate.
+    #I wish I could come up with a 'be best' joke to throw more shade at Melania
+    #but whatever.
+    if best:
+        hmms = orf_df.family_hmm.unique()
+        for hmm in hmms:
+            red_df = orf_df[orf_df['family_hmm'] == hmm]
+            if len(red_df) == 1:
+                continue
+            else:
+                red_df.sort_values(by='overall_bitscore')
+                to_drop = []
+                for i in range(1, len(red_df)):
+                    to_drop.append(red_df.iloc[i].name)
+                orf_df.drop(to_drop, axis=0)
+
+
 
     orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
@@ -390,7 +390,7 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
     return
 
 
-def fetch_outfiles(outdir, threshold, threads):
+def fetch_outfiles(outdir, threshold, threads, best):
     p = Pool(threads)
     hmmscandir = os.path.join(outdir, 'hmmscan')
     subdirectories = os.listdir(hmmscandir)
@@ -403,12 +403,12 @@ def fetch_outfiles(outdir, threshold, threads):
 
     hmmoutfiles = list(map(get_outfile, subdirectories_wpath))
 
-    parsed_hmm_outfiles = list(p.map(lambda outfile: parse_hmmdomtbl(outdir, outfile, threshold),
+    parsed_hmm_outfiles = list(p.map(lambda outfile: parse_hmmdomtbl(outdir, outfile, threshold, best),
                                      hmmoutfiles))
     return parsed_hmm_outfiles
 
 
-def run_hmms(fastafile, outdir, threshold):
+def run_hmms(fastafile, outdir, threshold, best):
 
     fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
 
@@ -420,7 +420,7 @@ def run_hmms(fastafile, outdir, threshold):
         os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
 
     # Run all HMMs for fastafile
-    return run_hmmscan(fastafile, outdir, threshold)
+    return run_hmmscan(fastafile, outdir, threshold, best)
 
 def main():
     args = parser.parse_args()
@@ -500,7 +500,7 @@ def main():
 
 
         #Make sure you get rid of any Nones
-        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold), protlist_wpath))))
+        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best), protlist_wpath))))
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df = pd.concat(all_df_list, sort=False)
