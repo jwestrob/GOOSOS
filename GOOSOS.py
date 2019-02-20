@@ -26,6 +26,7 @@ parser.add_argument('-no_seqs', default=False, action='store_true', help='Dont p
 parser.add_argument('-best', default=False, action='store_true', help='Only pull out best hit per genome')
 parser.add_argument('-align', default=False, action='store_true', help='Align fastas once extracted')
 parser.add_argument('-accurate', default=False, action='store_true', help='If aligning, use accurate (SLOW) mafft parameters.')
+parser.add_argument('-cut_nc', default=False, action='store_true', help='If using KEGG HMMs, use the --cut_nc option during hmmsearch (built in cutoffs)')
 
 
 def hmmpress(hmmlist_wpath, outdir):
@@ -63,12 +64,16 @@ def rename(hmmfile, hmmdir):
             f.write("%s\n" % item)
     return
 
-def run_hmmscan(protfile, outdir, threshold, best):
+def run_hmmscan(protfile, outdir, threshold, best, cut_nc):
     genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
 
     #print(protein_id, hmmfile)
-    cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
-            + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+    if not cut_na:
+        cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
+                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+    elif cut_na:
+        cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_nc --cpu ' \
+                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     #print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
@@ -408,7 +413,7 @@ def fetch_outfiles(outdir, threshold, threads, best):
     return parsed_hmm_outfiles
 
 
-def run_hmms(fastafile, outdir, threshold, best):
+def run_hmms(fastafile, outdir, threshold, best, cut_nc):
 
     fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
 
@@ -420,7 +425,7 @@ def run_hmms(fastafile, outdir, threshold, best):
         os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
 
     # Run all HMMs for fastafile
-    return run_hmmscan(fastafile, outdir, threshold, best)
+    return run_hmmscan(fastafile, outdir, threshold, best, cut_nc)
 
 def main():
     args = parser.parse_args()
@@ -439,6 +444,7 @@ def main():
     best = args.best
     align = args.align
     accurate = args.accurate
+    cut_nc = args.cut_nc
 
 
     have_proteins = True if prodigaldir is not None else False
@@ -500,7 +506,7 @@ def main():
 
 
         #Make sure you get rid of any Nones
-        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best), protlist_wpath))))
+        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc), protlist_wpath))))
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df = pd.concat(all_df_list, sort=False)
