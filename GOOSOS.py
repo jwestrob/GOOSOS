@@ -210,7 +210,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
 
     #Write it to tsv in outdir without index (annoying)
-    colnames = hitstable.columns.values.tolist()
+    colnames = hits.columns.values.tolist()
     colnames.insert(0, 'genome_id')
     hits.columns = colnames
     hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t')
