@@ -495,7 +495,6 @@ def main():
             p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
 
 
-
         if not have_proteins:
             protdir = outdir + '/proteins'
         else:
@@ -522,8 +521,10 @@ def main():
 
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
-        protdir = outdir + '/proteins'
-
+        if not have_proteins:
+            protdir = outdir + '/proteins'
+        else:
+            protdir = prodigaldir
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
         #Get list of protein files without full path
