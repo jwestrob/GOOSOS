@@ -29,13 +29,13 @@ I hope this will be useful for other things as well, though, and if you see thin
 
 So glad to see the enthusiasm. Here's a list. I know you love those.
 
-- Evalue thresholds (-evalue): This is the default evalue cutoff for HMMsearch. I recommend something like 1e-10 or lower. (HMMsearch accepts scientific notation, so type it out like that. If you hate conformity I guess you can type out 0.0000000001)
+- Evalue thresholds (`-evalue`): This is the default evalue cutoff for HMMsearch. I recommend something like 1e-10 or lower. (HMMsearch accepts scientific notation, so type it out like that. If you hate conformity I guess you can type out 0.0000000001)
 
-- Extract Best Hit (-best) [DEFAULT] : Pulls out the most relevant hit (i.e., the hit with the highest bitscore) per HMM per genome. That is, if a genome has two hits for a particular HMM, it takes the hit with the higher bitscore.
+- Extract Best Hit (`-best`) : Pulls out the most relevant hit (i.e., the hit with the highest bitscore) per HMM per genome. That is, if a genome has two hits for a particular HMM, it takes the hit with the higher bitscore.
 
-- If you already scanned with HMMsearch (-already_scanned) : Don't scan again! Skip to the next part, using the same output directory.
+- If you already scanned with HMMsearch (`-already_scanned`) : Don't scan again! Skip to the next part, using the same output directory.
 
-- If you don't want to write seqs and only want a hits table (-no_seqs) : Saves time if you're trying to calibrate your e-value threshold.
+- If you don't want to write seqs and only want a hits table (`-no_seqs`) : Saves time if you're trying to calibrate your e-value threshold.
 
 - `-cut_nc`, `-cut_ga`: KEGG and PFAM HMMs have built-in bitscore cutoff thresholds. `-cut_nc` uses the `-cut_nc` option in hmmsearch, and `-cut_ga` does the same. KEGG HMMs use the `-cut_nc` option, and PFAM HMMs use the `-cut_ga` option. 
 
