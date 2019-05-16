@@ -368,8 +368,6 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     orf_df = orf_df[orf_df['overall_evalue'].astype(float) <= threshold]
 
     #Great. Now let's deduplicate.
-    #I wish I could come up with a 'be best' joke to throw more shade at Melania
-    #but whatever.
     if best:
         hmms = orf_df.family_hmm.unique()
         for hmm in hmms:
@@ -435,11 +433,18 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
 
 def main():
     args = parser.parse_args()
-    nucdir = str(Path(args.nucdir).absolute())
+    if args.nucdir is not None:
+        nucdir = str(Path(args.nucdir).absolute())
+    else:
+        nucdir = None
     if args.protdir is not None:
         prodigaldir = str(Path(args.protdir).absolute())
     else:
         prodigaldir = None
+
+    if nucdir is None and protdir is None:
+        print("You need to provide a protein or nucleotide directory.")
+        sys.exit(420)
     hmmdir = str(Path(args.hmmdir).absolute())
     outdir = str(args.outdir)
     threshold = float(args.evalue)
