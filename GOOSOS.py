@@ -442,7 +442,7 @@ def main():
     else:
         prodigaldir = None
 
-    if nucdir is None and protdir is None:
+    if nucdir is None and prodigaldir is None:
         print("You need to provide a protein or nucleotide directory.")
         sys.exit(420)
     hmmdir = str(Path(args.hmmdir).absolute())
