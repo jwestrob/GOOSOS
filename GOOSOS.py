@@ -284,9 +284,11 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     lines_filtered = list(map(lambda x: x[0:23], lines_filtered))
 
     #Make pandas DF to store lines, then add column names
-    lines_df = pd.DataFrame(lines_filtered, columns=domtbl_header)
-
-
+    try:
+	    lines_df = pd.DataFrame(lines_filtered, columns=domtbl_header)
+    except:
+           print("Error parsing hmmdomtbl for: ", genome_id)
+           sys.exit()
     #Make DF to store properly arranged data
     goodheader_df = pd.DataFrame(columns=desired_header)
 
