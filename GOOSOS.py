@@ -116,61 +116,6 @@ def extract_hits_by_hmm(red_df, threads, outdir):
 
     return recs
 
-def dedupe(all_df):
-    value_counts = all_df['orf_id'].value_counts()
-    unique_orfs = all_df['orf_id'].unique()
-
-    multiple_hit_orfs = list(filter(lambda x: value_counts[x] > 1, unique_orfs))
-
-    duplicate_flag = False
-
-    rows_to_remove = []
-
-    for hit in multiple_hit_orfs:
-        red_df = all_df[all_df['orf_id'] == hit]
-        red_df = red_df.sort_values(by='overall_bitscore', ascending=False)
-        red_df_ids = red_df.orf_id.tolist()
-        red_df_genome_ids = red_df.genome_id.tolist()
-
-        #Check for different genomes in IDs; if it's a bunch of duplicate genomes
-        #(Which happens, mind you) don't remove them. Set a flag and yell at the user
-        if not any(red_df_genome_ids.count(x) > 1 for x in red_df_genome_ids):
-            duplicate_flag = True
-
-            #Deduplicate (possibly) each genome
-            for genome in red_df_genome_ids:
-                double_red_df = red_df[red_df['genome_id'] == genome]
-
-                #Well it's not really a duplicate in THIS sense, is it?
-                #Dereplicate your genome set prior to analysis if you care about this.
-                #That's not GOOSOS's job.
-                if len(double_red_df) == 1:
-                    continue
-                elif len(double_red_df) == 0:
-                    print("Jacob fucked up! Line 152. You're iterating over an empty DF bro")
-                    sys.exit()
-                else:
-                    double_red_df = double_red_df.sort_values(by='overall_bitscore')
-                    for row_num in range(1,len(double_red_df)):
-                        rows_to_remove.append(double_red_df.iloc[row_num].name)
-            continue
-
-        else:
-            #It's all one genome! That makes it easy.
-            for row_num in range(1,len(red_df)):
-                rows_to_remove.append(red_df.iloc[row_num].name)
-
-    if duplicate_flag:
-        print("Your genome set has duplicates. (Like, same ORF IDs and everything, but different genome IDs.)")
-        print("I (GOOSOS) highly recommend dereplicating your genome set. Try dRep.")
-
-    all_df_deduped = all_df.drop(labels=rows_to_remove, axis=0)
-
-    return all_df_deduped
-
-
-
-
 def extract_hits(all_df, threads, outdir):
     #List of recs (value to return)
     recs_by_hmm = []
@@ -371,6 +316,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
     orf_df = pd.DataFrame(orflist, columns=orflist_header)
     orf_df = orf_df[orf_df['overall_evalue'].astype(float) <= threshold]
+    orf_df = orf_df[orf_df['query_length'].astype(float) >= 0.75*orf_df['hmm_length'].astype(float)]
+    #and float(goodheader_df.query_length) > 0.75*float(goodheader_df.hmm_length)
 
     #Great. Now let's deduplicate.
     if best:
