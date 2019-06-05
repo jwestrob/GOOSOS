@@ -484,6 +484,8 @@ def main():
             protdir = prodigaldir
 
         if not os.path.exists(outdir + '/all_hits_evalues_df.tsv'):
+            protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
+            
             #Make sure you get rid of any Nones
             parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
 
