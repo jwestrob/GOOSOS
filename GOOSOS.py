@@ -256,7 +256,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     #print(unique_orfs)
 
     orflist = []
-    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'overall_bitscore', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'query_length', 'overall_bitscore', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
                       'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_cevalue', 'dom2_hmmstart',
                       'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
     for orf in unique_orfs:
@@ -280,6 +280,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
                                 genome_id,
                                 goodrow.orf_id,
                                 goodrow.hmm_length,
+                                goodrow.query_length,
                                 goodrow.bitscore,
                                 goodrow.evalue,
                                 goodrow.c_evalue,
@@ -304,6 +305,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
                                 genome_id,
                                 goodrow.orf_id,
                                 goodrow.hmm_length,
+                                goodrow.query_length,
                                 goodrow.bitscore,
                                 goodrow.evalue,
                                 goodrow.c_evalue,
@@ -485,7 +487,7 @@ def main():
 
         if not os.path.exists(outdir + '/all_hits_evalues_df.tsv'):
             protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
-            
+
             #Make sure you get rid of any Nones
             parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
 
