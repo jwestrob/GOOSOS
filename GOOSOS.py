@@ -30,7 +30,7 @@ parser.add_argument('-cut_nc', default=False, action='store_true', help='If usin
 parser.add_argument('-cut_ga', default=False, action='store_true', help='If using PFAM HMMs, use the --cut_ga option during hmmsearch (built in cutoffs)')
 
 
-def hmmpress(hmmlist_wpath, outdir):
+def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
     #Concatenate all hmm files together and press them into a binary
     list_of_hmms = ' '.join(hmmlist_wpath)
 
@@ -43,6 +43,36 @@ def hmmpress(hmmlist_wpath, outdir):
     for hmmfile in hmmlist_wpath:
         rename(hmmfile, outdir + '/hmmpress/')
 
+    if cut_nc or cut_ga:
+        hmm_thresh_list = []
+    else:
+        hmm_thresh_list = None
+
+    for hmmfile in hmmlist_wpath:
+        hmmname = hmmfile.split('.hmm')[0]
+        with open(hmmname, 'r') as infile:
+            lines = [x.rstrip() for x in infile.readlines()]
+        nc = list(filter(lambda x: x.startswith('NC'), lines))
+
+        if len(nc) == 0:
+            nc = 0
+        else:
+            #Grab threshold from middle element
+            nc = nc[0].split()[1]
+
+        ga = list(filter(lambda x: x.startswith('GA'), lines))
+
+        if len(ga) == 0:
+            ga = 0
+        else:
+            #Grab threshold from middle element
+            ga = ga[0].split()[1]
+
+        thresh  = max(nc, ga)
+        hmm_thresh_list.append(hmmname, thresh)
+
+    hmm_thresh_dict = dict(hmm_thresh_list)
+
 
     hmmpressdir = outdir + '/hmmpress/'
 
@@ -52,7 +82,7 @@ def hmmpress(hmmlist_wpath, outdir):
 
     os.system('hmmpress ' + hmmpressdir + 'concatenated_hmms.hmm')
 
-    return
+    return hmm_thresh_dict
 
 def rename(hmmfile, hmmdir):
     with open(hmmfile, 'r') as f:
@@ -125,7 +155,7 @@ def extract_hits(all_df, threads, outdir):
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
-        red_df = all_df[all_df['family_hmm'] == hmm]
+        red_df = all_df[all_df['family_hmm'] == hmm & all_df['above_threshold'] == True]
         recs_by_hmm.append([extract_hits_by_hmm(red_df, threads, outdir), hmm])
 
     return recs_by_hmm
@@ -385,6 +415,10 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
     # Run all HMMs for fastafile
     return run_hmmscan(fastafile, outdir, threshold, best, cut_nc, cut_ga)
 
+def mark_with_threshold(all_df, hmm_thresh_dict):
+    all_df['above_threshold'] = all_df.apply(lambda x: x.overall_bitscore >= hmm_thresh_dict[x.family_hmm])
+    return all_df
+
 def main():
     args = parser.parse_args()
     if args.nucdir is not None:
@@ -439,7 +473,10 @@ def main():
 
     if not already_scanned:
         #Generate binary files for hmmsearch
-        hmmpress(hmmlist_wpath, outdir)
+        hmm_thresh_dict = hmmpress(hmmlist_wpath, outdir)
+        np.save(os.path.join(outdir, 'hmm_thresh_dict.npy'), hmm_thresh_dict)
+    else:
+        np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'))
 
     parsed_hmm_outfiles = []
 
@@ -475,6 +512,8 @@ def main():
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df = pd.concat(all_df_list, sort=False)
+
+        all_df = mark_with_threshold(all_df, hmm_thresh_dict)
 
         all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
 
