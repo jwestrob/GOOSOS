@@ -45,33 +45,36 @@ def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
 
     if cut_nc or cut_ga:
         hmm_thresh_list = []
+
+        for hmmfile in hmmlist_wpath:
+            hmmname = hmmfile.split('.hmm')[0]
+            with open(hmmname, 'r') as infile:
+                lines = [x.rstrip() for x in infile.readlines()]
+            nc = list(filter(lambda x: x.startswith('NC'), lines))
+
+            if len(nc) == 0:
+                nc = 0
+            else:
+                #Grab threshold from middle element
+                nc = nc[0].split()[1]
+
+            ga = list(filter(lambda x: x.startswith('GA'), lines))
+
+            if len(ga) == 0:
+                ga = 0
+            else:
+                #Grab threshold from middle element
+                ga = ga[0].split()[1]
+
+            thresh  = max(nc, ga)
+            hmm_thresh_list.append(hmmname, thresh)
+
+        hmm_thresh_dict = dict(hmm_thresh_list)
     else:
         hmm_thresh_list = None
+        hmm_thresh_dict = None
 
-    for hmmfile in hmmlist_wpath:
-        hmmname = hmmfile.split('.hmm')[0]
-        with open(hmmname, 'r') as infile:
-            lines = [x.rstrip() for x in infile.readlines()]
-        nc = list(filter(lambda x: x.startswith('NC'), lines))
 
-        if len(nc) == 0:
-            nc = 0
-        else:
-            #Grab threshold from middle element
-            nc = nc[0].split()[1]
-
-        ga = list(filter(lambda x: x.startswith('GA'), lines))
-
-        if len(ga) == 0:
-            ga = 0
-        else:
-            #Grab threshold from middle element
-            ga = ga[0].split()[1]
-
-        thresh  = max(nc, ga)
-        hmm_thresh_list.append(hmmname, thresh)
-
-    hmm_thresh_dict = dict(hmm_thresh_list)
 
 
     hmmpressdir = outdir + '/hmmpress/'
@@ -416,7 +419,10 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
     return run_hmmscan(fastafile, outdir, threshold, best, cut_nc, cut_ga)
 
 def mark_with_threshold(all_df, hmm_thresh_dict):
-    all_df['above_threshold'] = all_df.apply(lambda x: x.overall_bitscore >= hmm_thresh_dict[x.family_hmm])
+
+    if hmm_thresh_dict is not  None:
+        all_df['above_threshold'] = all_df.apply(lambda x: x.overall_bitscore >= hmm_thresh_dict[x.family_hmm])
+
     return all_df
 
 def main():
