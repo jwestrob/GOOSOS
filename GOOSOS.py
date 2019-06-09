@@ -421,7 +421,7 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
 def mark_with_threshold(all_df, hmm_thresh_dict):
 
     if hmm_thresh_dict is not  None:
-        all_df['above_threshold'] = all_df.apply(lambda x: x.overall_bitscore >= hmm_thresh_dict[x.family_hmm])
+        all_df['above_threshold'] = all_df.apply(lambda x: x.overall_bitscore >= hmm_thresh_dict[x.family_hmm], axis=1)
 
     return all_df
 
