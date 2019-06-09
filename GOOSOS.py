@@ -512,6 +512,9 @@ def main():
         if not os.path.exists(outdir + '/hmmscan/'):
             os.system('mkdir ' + outdir + '/hmmscan/')
 
+        if cut_nc is False and cut_ga is False:
+            print('hmmscan will be run with no built-in thresholds. Please make sure you filter afterwards if you want quality filtering.')
+            print('All you need to do is delete unsuitable rows from all_hits_evalues_df and rerun with the -already_scanned flag.')
 
         #Make sure you get rid of any Nones
         parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
