@@ -67,7 +67,7 @@ def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
                 ga = ga[0].split()[1]
 
             thresh  = max(nc, ga)
-            hmm_thresh_list.append(hmmname, thresh)
+            hmm_thresh_list.append([hmmname, thresh])
 
         hmm_thresh_dict = dict(hmm_thresh_list)
     else:
