@@ -48,7 +48,7 @@ def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
 
         for hmmfile in hmmlist_wpath:
             hmmname = hmmfile.split('.hmm')[0]
-            with open(hmmname, 'r') as infile:
+            with open(hmmfile, 'r') as infile:
                 lines = [x.rstrip() for x in infile.readlines()]
             nc = list(filter(lambda x: x.startswith('NC'), lines))
 
