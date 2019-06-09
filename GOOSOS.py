@@ -158,7 +158,8 @@ def extract_hits(all_df, threads, outdir):
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
-        red_df = all_df[all_df['family_hmm'] == hmm & all_df['above_threshold'] == True]
+        red_df_nothresh = all_df[all_df['family_hmm'] == hmm]
+        red_df = red_df_nothresh[red_df_nothresh['above_threshold']]
         recs_by_hmm.append([extract_hits_by_hmm(red_df, threads, outdir), hmm])
 
     return recs_by_hmm
