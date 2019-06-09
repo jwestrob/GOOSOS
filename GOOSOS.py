@@ -521,12 +521,14 @@ def main():
         parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
-        all_df = pd.concat(all_df_list, sort=False)
+        all_df_init = pd.concat(all_df_list, sort=False)
 
-        all_df = mark_with_threshold(all_df, hmm_thresh_dict)
+        all_df_thresh = mark_with_threshold(all_df_init, hmm_thresh_dict)
+
+        all_df = all_df_thresh[all_df_thresh['above_threshold']]
 
         all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
-
+        print("Hits information written to all_hits_evalues_df.tsv.")
     #Make sure these variables are loaded in case you activated -already_scanned
     if already_scanned:
         if not have_proteins:
