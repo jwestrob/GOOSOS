@@ -130,7 +130,7 @@ def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_id = str(genome_id)
     genome_dir = outdir + '/hmmscan/' + genome_id + '/'
-    protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
+    protfile = list(filter(lambda x: '.faa' in x or '.fa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
     desired_hit = list(filter(lambda x: orf == x.id, genome_recs))[0]
@@ -483,7 +483,7 @@ def main():
         hmm_thresh_dict = hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga)
         np.save(os.path.join(outdir, 'hmm_thresh_dict.npy'), hmm_thresh_dict)
     else:
-        np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'))
+        np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'), allow_pickle=True)
 
     parsed_hmm_outfiles = []
 
