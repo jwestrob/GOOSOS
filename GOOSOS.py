@@ -130,7 +130,7 @@ def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_id = str(genome_id)
     genome_dir = outdir + '/hmmscan/' + genome_id + '/'
-    protfile = list(filter(lambda x: '.faa' in x, os.listdir(genome_dir)))[0]
+    protfile = list(filter(lambda x: '.faa' in x or '.fa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
     desired_hit = list(filter(lambda x: orf == x.id, genome_recs))[0]
