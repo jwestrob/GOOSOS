@@ -483,7 +483,7 @@ def main():
         hmm_thresh_dict = hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga)
         np.save(os.path.join(outdir, 'hmm_thresh_dict.npy'), hmm_thresh_dict)
     else:
-        np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'))
+        np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'), allow_pickle=True)
 
     parsed_hmm_outfiles = []
 

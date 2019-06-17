@@ -25,7 +25,7 @@ parser.add_argument('-aln_concat', action='store_true', default=False,
                 help="For if you already did filtering on your fastas (assumed to be in outdir/fastas) and just want to align/concatenate.")
 parser.add_argument('-just_concat', action='store_true', default=False,
                 help="For if you just want to concatenate some alignments (assumed to be in outdir/alignments). DOES NOT FILTER BASED ON THRESHOLD!")
-parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]', default=None,
+parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]', default=0.5,
                 help="Percentage threshold (as a number between 0 and 1) \
                 indicating how many hits out of the total a genome must have in \
                 order to be included in the final alignment. Default: 50 (0.5)")
