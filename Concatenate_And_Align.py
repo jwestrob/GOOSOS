@@ -170,8 +170,10 @@ def main(args):
 
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
-
-        fastadir = outdir + 'fastas'
+        if outdir.endswith('/'):
+            fastadir = outdir + 'fastas'
+        else:
+            fastadir = outdir + '/fastas'
         #You don't have to be loonelyyyyy at fastasonly.com
         fastas_only = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))
         fastas_recs = list(map(lambda fastafile:
