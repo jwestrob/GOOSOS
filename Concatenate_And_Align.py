@@ -131,7 +131,7 @@ def throw_flags(hitstable, genomes_passed_threshold):
 
 
 def main(args):
-    outdir = args.outdir[0]
+    outdir = str(Path(args.hmmdir[0]).absolute())
     aln_concat = args.aln_concat
     just_concat = args.just_concat
     threshold = args.hits_threshold
