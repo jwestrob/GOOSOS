@@ -71,7 +71,6 @@ def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
 
         hmm_thresh_dict = dict(hmm_thresh_list)
     else:
-        hmm_thresh_list = None
         hmm_thresh_dict = None
 
 
@@ -107,7 +106,7 @@ def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
     #print(protein_id, hmmfile)
     if not cut_nc and not cut_ga:
         cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
-                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+                + str(1) + ' -E ' + str(threshold) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     elif cut_nc:
         cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_nc --cpu ' \
                 + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
