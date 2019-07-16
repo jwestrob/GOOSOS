@@ -523,10 +523,12 @@ def main():
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df_init = pd.concat(all_df_list, sort=False)
 
-        all_df_thresh = mark_with_threshold(all_df_init, hmm_thresh_dict)
-
-        all_df = all_df_thresh[all_df_thresh['above_threshold']]
-
+        if hmm_thresh_dict is not None:
+            all_df_thresh = mark_with_threshold(all_df_init, hmm_thresh_dict)
+            all_df = all_df_thresh[all_df_thresh['above_threshold']]
+        else:
+            all_df = all_df_init
+            
         all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
         print("Hits information written to all_hits_evalues_df.tsv.")
     #Make sure these variables are loaded in case you activated -already_scanned
