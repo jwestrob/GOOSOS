@@ -158,8 +158,11 @@ def extract_hits(all_df, threads, outdir):
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
-        red_df_nothresh = all_df[all_df['family_hmm'] == hmm]
-        red_df = red_df_nothresh[red_df_nothresh['above_threshold']]
+        if 'above_threshold' in all_df.columns.tolist()
+            red_df_nothresh = all_df[all_df['family_hmm'] == hmm]
+            red_df = red_df_nothresh[red_df_nothresh['above_threshold']]
+        else:
+            red_df = all_df[all_df['family_hmm'] == hmm]
         recs_by_hmm.append([extract_hits_by_hmm(red_df, threads, outdir), hmm])
 
     return recs_by_hmm
@@ -528,7 +531,7 @@ def main():
             all_df = all_df_thresh[all_df_thresh['above_threshold']]
         else:
             all_df = all_df_init
-            
+
         all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
         print("Hits information written to all_hits_evalues_df.tsv.")
     #Make sure these variables are loaded in case you activated -already_scanned
