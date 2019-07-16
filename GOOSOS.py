@@ -158,7 +158,7 @@ def extract_hits(all_df, threads, outdir):
 
     #I could use a map, but like... why
     for hmm in all_df['family_hmm'].unique().tolist():
-        if 'above_threshold' in all_df.columns.tolist()
+        if 'above_threshold' in all_df.columns.tolist():
             red_df_nothresh = all_df[all_df['family_hmm'] == hmm]
             red_df = red_df_nothresh[red_df_nothresh['above_threshold']]
         else:
