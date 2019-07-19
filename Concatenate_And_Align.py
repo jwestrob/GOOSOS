@@ -168,20 +168,23 @@ def main(args):
         #Get order of genomes
         genomes = hitstable['id'].tolist()
 
+
         genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
         if outdir.endswith('/'):
             fastadir = outdir + 'fastas'
         else:
             fastadir = outdir + '/fastas'
+
         #You don't have to be loonelyyyyy at fastasonly.com
         fastas_only = list(filter(lambda x: '.faa' in x, os.listdir(fastadir)))
         fastas_recs = list(map(lambda fastafile:
                       list(SeqIO.parse(os.path.join(fastadir, fastafile),'fasta')),
                        fastas_only))
 
+
         for fasta in fastas_recs:
-            fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
+            fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold and x.id in all_df.orf_id.tolist(), fasta))
 
 
         #Make subdirectory to store filtered fastas
