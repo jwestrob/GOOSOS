@@ -185,14 +185,28 @@ def main(args):
 
         orf_id_list = all_df.orf_id.tolist()
 
-        fastas_recs_filtered = []
-        for fasta in fastas_recs:
-            fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
-            newrecs = []
-            for rec in fasta:
-                if rec.id.split('|')[-1] in orf_id_list:
-                    newrecs.append(rec)
-            fastas_recs_filtered.append(newrecs)
+        all_hits_filtered = all_df[all_df.genome_id.isin(genomes_passed_threshold)]
+        if len(all_hits_filtered) == 0:
+            print("WHOOPS1")
+            sys.exit()
+
+        goodseqs = fastadir + '/filtered_fastas'
+        if not os.path.exists(goodseqs):
+            os.mkdir(goodseqs)
+
+
+        for index, fastafile in enumerate(fastas_recs):
+            fastaname = fastas_only[index].split('_hits.faa')[0]
+            red_df = all_df[all_df.family_hmm == fastaname]
+            red_df_orflist = red_df.orf_id.tolist()
+            new_recs = []
+
+            for rec in SeqIO.parse(os.path.join('fastas', fastas_only[index])):
+                orf_id = rec.id.split('|')[-1]
+                if orf_id in red_df_orflist:
+                    new_recs.append(rec)
+            SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]))
+
 
         if sum([len(x) for x in fastas_recs_filtered]) != len(orf_id_list):
             print("WHOOPS")
@@ -201,9 +215,6 @@ def main(args):
             print("OK!")
 
         #Make subdirectory to store filtered fastas
-        goodseqs = fastadir + '/filtered_fastas'
-        if not os.path.exists(goodseqs):
-            os.mkdir(goodseqs)
 
         for index, fastafile in enumerate(fastas_only):
             SeqIO.write(fastas_recs_filtered[index], os.path.join(goodseqs,fastafile), 'fasta')
