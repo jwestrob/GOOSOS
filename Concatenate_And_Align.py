@@ -201,7 +201,7 @@ def main(args):
             red_df_orflist = red_df.orf_id.tolist()
             new_recs = []
 
-            for rec in SeqIO.parse(os.path.join('fastas', fastas_only[index])):
+            for rec in SeqIO.parse(os.path.join('fastas', fastas_only[index]), 'fasta'):
                 orf_id = rec.id.split('|')[-1]
                 if orf_id in red_df_orflist:
                     new_recs.append(rec)
