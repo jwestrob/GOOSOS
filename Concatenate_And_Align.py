@@ -185,7 +185,7 @@ def main(args):
 
         for fasta in fastas_recs:
             fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
-            fasta = list(filter(lambda x: x.id in all_df.orf_id, fasta))
+            fasta = list(filter(lambda x: x.id.split('|')[-1] in all_df.orf_id, fasta))
 
 
         #Make subdirectory to store filtered fastas
