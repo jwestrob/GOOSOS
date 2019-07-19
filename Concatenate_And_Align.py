@@ -190,6 +190,7 @@ def main(args):
             print("WHOOPS1")
             sys.exit()
 
+        #Make subdirectory to store filtered fastas
         goodseqs = fastadir + '/filtered_fastas'
         if not os.path.exists(goodseqs):
             os.mkdir(goodseqs)
@@ -215,13 +216,6 @@ def main(args):
             sys.exit()
         else:
             print("OK!")
-
-        #Make subdirectory to store filtered fastas
-
-        for index, fastafile in enumerate(fastas_only):
-            SeqIO.write(fastas_recs_filtered[index], os.path.join(goodseqs,fastafile), 'fasta')
-
-        #throw_flags(hitstable, genomes_passed_threshold)
 
         print(str(len(genomes_passed_threshold)) + " genomes passed the threshold for number of hits.")
 
