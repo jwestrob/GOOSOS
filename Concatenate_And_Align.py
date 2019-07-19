@@ -186,8 +186,15 @@ def main(args):
         orf_id_list = all_df.orf_id.tolist()
         for fasta in fastas_recs:
             fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
-            fasta = list(filter(lambda x: x.id.split('|')[-1] in orf_id_list, fasta))
+            newrecs = []
+            for rec in fasta:
+                if rec.id.split('|')[-1] in orf_id_list:
+                    newrecs.append(rec)
+            fasta = newrecs
 
+        if sum([len(x) for x in fastas_recs]) != len(orf_id_list):
+            print("WHOOPS")
+            sys.exit()
 
         #Make subdirectory to store filtered fastas
         goodseqs = fastadir + '/filtered_fastas'
