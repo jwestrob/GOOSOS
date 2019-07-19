@@ -205,7 +205,7 @@ def main(args):
                 orf_id = rec.id.split('|')[-1]
                 if orf_id in red_df_orflist:
                     new_recs.append(rec)
-            SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]))
+            SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]), 'fasta')
 
 
         if sum([len(x) for x in fastas_recs_filtered]) != len(orf_id_list):
