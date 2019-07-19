@@ -184,17 +184,21 @@ def main(args):
 
 
         orf_id_list = all_df.orf_id.tolist()
+
+        fastas_recs_filtered = []
         for fasta in fastas_recs:
             fasta = list(filter(lambda x: x.id.split('|')[0] in genomes_passed_threshold, fasta))
             newrecs = []
             for rec in fasta:
                 if rec.id.split('|')[-1] in orf_id_list:
                     newrecs.append(rec)
-            fasta = newrecs
+            fastas_recs_filtered.append(newrecs)
 
-        if sum([len(x) for x in fastas_recs]) != len(orf_id_list):
+        if sum([len(x) for x in fastas_recs_filtered]) != len(orf_id_list):
             print("WHOOPS")
             sys.exit()
+        else:
+            print("OK!")
 
         #Make subdirectory to store filtered fastas
         goodseqs = fastadir + '/filtered_fastas'
@@ -202,7 +206,7 @@ def main(args):
             os.mkdir(goodseqs)
 
         for index, fastafile in enumerate(fastas_only):
-            SeqIO.write(fastas_recs[index], os.path.join(goodseqs,fastafile), 'fasta')
+            SeqIO.write(fastas_recs_filtered[index], os.path.join(goodseqs,fastafile), 'fasta')
 
         #throw_flags(hitstable, genomes_passed_threshold)
 
