@@ -194,7 +194,7 @@ def main(args):
         if not os.path.exists(goodseqs):
             os.mkdir(goodseqs)
 
-
+        lengths = []
         for index, fastafile in enumerate(fastas_recs):
             fastaname = fastas_only[index].split('_hits.faa')[0]
             red_df = all_df[all_df.family_hmm == fastaname]
@@ -205,10 +205,12 @@ def main(args):
                 orf_id = rec.id.split('|')[-1]
                 if orf_id in red_df_orflist:
                     new_recs.append(rec)
+
+            lengths.append(len(new_recs))
             SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]), 'fasta')
 
 
-        if sum([len(x) for x in fastas_recs_filtered]) != len(orf_id_list):
+        if sum(lengths) != len(orf_id_list):
             print("WHOOPS")
             sys.exit()
         else:
