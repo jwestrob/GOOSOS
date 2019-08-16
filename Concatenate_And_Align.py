@@ -201,6 +201,7 @@ def main(args):
         for index, fastafile in enumerate(fastas_recs):
             fastaname = fastas_only[index].split('_hits.faa')[0]
             red_df = all_df[all_df.family_hmm == fastaname]
+            red_df_orflist = red_df.orf_id.tolist()
             new_recs = []
 
             for rec in SeqIO.parse(os.path.join(fastadir, fastas_only[index]), 'fasta'):
@@ -212,6 +213,8 @@ def main(args):
 
 
         if sum(lengths) != len(orf_id_list):
+            print("sum(lengths): ", sum(lengths))
+            print("len(orf_id_list): ", len(orf_id_list))
             print("WHOOPS")
             sys.exit()
         else:
