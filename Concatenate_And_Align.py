@@ -183,9 +183,11 @@ def main(args):
                        fastas_only))
 
 
-        orf_id_list = all_df.orf_id.tolist()
+
 
         all_hits_filtered = all_df[all_df.genome_id.isin(genomes_passed_threshold)]
+        orf_id_list = all_df.orf_id.tolist()
+
         if len(all_hits_filtered) == 0:
             print("WHOOPS1")
             sys.exit()
@@ -199,12 +201,10 @@ def main(args):
         for index, fastafile in enumerate(fastas_recs):
             fastaname = fastas_only[index].split('_hits.faa')[0]
             red_df = all_df[all_df.family_hmm == fastaname]
-            red_df_orflist = red_df.orf_id.tolist()
             new_recs = []
 
             for rec in SeqIO.parse(os.path.join(fastadir, fastas_only[index]), 'fasta'):
-                orf_id = rec.id.split('|')[-1]
-                if orf_id in red_df_orflist:
+                if rec.id in red_df_orflist:
                     new_recs.append(rec)
 
             lengths.append(len(new_recs))
