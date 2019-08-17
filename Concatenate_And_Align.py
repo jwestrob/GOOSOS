@@ -35,7 +35,7 @@ parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
                 help="Number of threads to use (helpful for MAFFT).")
 
 def pass_sum_threshold(genome_id, threshold, df):
-    total = len(df.columns.values)
+    total = float(len(df.drop('id', axis=1).columns.values))
     hits_threshold = float(threshold)*total
     num_hits = df[df.id == genome_id].sum(axis=1).tolist()[0]
     if num_hits < hits_threshold:
