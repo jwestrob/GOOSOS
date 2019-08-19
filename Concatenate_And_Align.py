@@ -219,7 +219,7 @@ def main(args):
             flatten = lambda l: [item for sublist in l for item in sublist]
             all_orf_ids = flatten(all_orf_ids)
             not_in_goodset = list(filter(lambda x: x not in all_orf_ids, orf_id_list))
-            print(not_in_gooset[0:5])
+            print(not_in_goodset[0:5])
             print("sum(lengths): ", sum(lengths))
             print("len(orf_id_list): ", len(orf_id_list))
 
