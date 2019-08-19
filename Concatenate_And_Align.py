@@ -228,7 +228,7 @@ def main(args):
                 not_in_goodset = list(filter(lambda x: x not in orf_id_list, all_orf_ids))
                 all_orf_ids = pd.Series(all_orf_ids)
                 vc = all_orf_ids.value_counts()
-                print(orf for orf in all_orf_ids if vc[orf] > 1)
+                print([orf for orf in all_orf_ids if vc[orf] > 1])
 
 
 
