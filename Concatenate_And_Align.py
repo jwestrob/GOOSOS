@@ -198,6 +198,8 @@ def main(args):
             os.mkdir(goodseqs)
 
         lengths = []
+        all_orf_ids = []
+
         for index, fastafile in enumerate(fastas_recs):
             fastaname = fastas_only[index].split('_hits.faa')[0]
             red_df = all_df[all_df.family_hmm == fastaname]
@@ -209,12 +211,19 @@ def main(args):
                     new_recs.append(rec)
 
             lengths.append(len(new_recs))
+            all_orf_ids.append([rec.id for rec in recs])
             SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]), 'fasta')
 
 
         if sum(lengths) != len(orf_id_list):
+            flatten = lambda l: [item for sublist in l for item in sublist]
+            all_orf_ids = flatten(all_orf_ids)
+            not_in_goodset = list(filter(lambda x: x not in all_orf_ids, orf_id_list))
+            print(not_in_gooset[0:5])
             print("sum(lengths): ", sum(lengths))
             print("len(orf_id_list): ", len(orf_id_list))
+
+
             print("WHOOPS")
             sys.exit()
         else:
