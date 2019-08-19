@@ -211,7 +211,7 @@ def main(args):
                     new_recs.append(rec)
 
             lengths.append(len(new_recs))
-            all_orf_ids.append([rec.id for rec in new_recs])
+            all_orf_ids.append([rec.id.split('|')[-1] for rec in new_recs])
             SeqIO.write(new_recs, os.path.join(goodseqs, fastas_only[index]), 'fasta')
 
 
