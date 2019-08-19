@@ -6,6 +6,7 @@ import os, sys, pandas as pd
 from pathlib import Path
 from Bio.Seq import Seq
 import numpy as np
+import collections
 import subprocess
 import argparse
 
@@ -225,8 +226,9 @@ def main(args):
                 print(not_in_goodset[0:5])
             else:
                 not_in_goodset = list(filter(lambda x: x not in orf_id_list, all_orf_ids))
-                print(not_in_goodset[0:5])
-                
+                all_orf_ids = pd.Series(all_orf_ids)
+                print(all_orf_ids[all_orf_ids.value_counts() > 1])
+
 
 
 
