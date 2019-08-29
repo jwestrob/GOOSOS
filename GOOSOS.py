@@ -476,7 +476,7 @@ def main():
     #fastalist = list(map(lambda file: file.split('.f')[0], os.listdir(fastadir)))
 
     # Get list of paths of all HMM files
-    hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), os.listdir(hmmdir)))
+    hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), filter(lambda x: x.endswith('.hmm'), os.listdir(hmmdir))))
 
     # Get list of all HMMs
     hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
