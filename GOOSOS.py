@@ -479,7 +479,7 @@ def main():
     hmmlist_wpath = list(map(lambda file: os.path.join(hmmdir, file), filter(lambda x: x.endswith('.hmm'), os.listdir(hmmdir))))
 
     # Get list of all HMMs
-    hmmlist = list(map(lambda file: file.split('.hmm')[0], os.listdir(hmmdir)))
+    hmmlist = list(map(lambda file: file.split('.hmm')[0], filter(lambda x: x.endswith('.hmm'),os.listdir(hmmdir))))
 
     if not already_scanned:
         #Generate binary files for hmmsearch
