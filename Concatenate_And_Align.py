@@ -84,7 +84,7 @@ def sort(alignment, genomes):
     return out_alignment
 
 def concatenate(alignments_recs, alignment_name, alignments_dir):
-    alignments_recs = list(filter(lambda x: len(x) is not 0, alignments_recs))
+    alignments_recs = list(filter(lambda x: x is not None, alignments_recs))
     master_aln = alignments_recs[0]
     master_ids = [rec.id for rec in master_aln]
     for index, rec in enumerate(master_aln):
