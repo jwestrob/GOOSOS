@@ -84,6 +84,7 @@ def sort(alignment, genomes):
     return out_alignment
 
 def concatenate(alignments_recs, alignment_name, alignments_dir):
+    alignments_recs = list(filter(lambda x: len(x) is not 0, alignments_recs))
     master_aln = alignments_recs[0]
     master_ids = [rec.id for rec in master_aln]
     for index, rec in enumerate(master_aln):
@@ -290,7 +291,7 @@ def main(args):
         alignments_recs_sorted = list(map(lambda alignment: sort(alignment, all_ids),
                                                             alignments_recs))
 
-    lengths = [len(alignment[0].seq) for index, alignment in enumerate(alignments_recs_sorted)]
+    lengths = [len(alignment[0].seq) if alignment is not None else 0 for index, alignment in enumerate(alignments_recs_sorted)]
     print("Your concatenated alignment is " + str(sum(lengths)) + ' characters long. Congratulations')
 
     #Make partition file for phylogenomic analysis
