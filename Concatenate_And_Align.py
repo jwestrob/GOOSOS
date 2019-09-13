@@ -295,7 +295,7 @@ def main(args):
     print("Your concatenated alignment is " + str(sum(lengths)) + ' characters long. Congratulations')
 
     #Make partition file for phylogenomic analysis
-    make_partition_file(alignments_recs_sorted, alignments_dir)
+    #make_partition_file(alignments_recs_sorted, alignments_dir)
 
     #Concatenate and make final alignment
     concatenate(alignments_recs_sorted, alignment_name, alignments_dir)
