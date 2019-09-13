@@ -56,6 +56,8 @@ def align_fn(fastafile_wpath, outdir, threads, inaccurate):
     return
 
 def sort(alignment, genomes):
+    if len(alignment) == 0:
+        return
     alignment_length = len(alignment[0].seq)
     genomes_dict = dict(zip(genomes, range(len(genomes))))
     index_dict = dict(zip(range(len(genomes)), genomes))
