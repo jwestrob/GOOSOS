@@ -59,7 +59,7 @@ def sort(alignment, genomes):
     #Check for empty alignments
     try:
         alignment_length = len(alignment[0].seq)
-    else:
+    except:
         return None
     genomes_dict = dict(zip(genomes, range(len(genomes))))
     index_dict = dict(zip(range(len(genomes)), genomes))
