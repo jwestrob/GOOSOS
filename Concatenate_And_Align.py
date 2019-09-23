@@ -36,7 +36,7 @@ parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
                 help="Number of threads to use (helpful for MAFFT).")
 
 def pass_sum_threshold(genome_id, threshold, df, exclude):
-    total = float(len(list(filter(lambda x: x not in exclude, df.drop('id', axis=1).columns.values))))
+    total = float(len())
     hits_threshold = float(threshold)*total
     num_hits = df[df.id == genome_id].sum(axis=1).tolist()[0]
     if num_hits < hits_threshold:
@@ -170,6 +170,19 @@ def main(args):
         #Get hitstable
         hitstable = pd.read_csv(outdir + '/HITSTABLE.tsv', sep='\t')
         hitstable.columns.values[0] = 'id'
+
+        #Drop columns for HMMs that are excluded
+        hitstable = hitstable.drop(exclude, axis=1)
+
+        hmms_in_hitstable = hitstable.columns.values[1:]
+
+        relevant_hmms = all_df.family_hmm.unique().tolist()
+
+        #Make sure you only are looking at HMMs that are in all_hits_evalues_df
+        if any(x not in relevant_hmms for x in hmms_in_hitstable):
+            hmms_to_drop = list(filter(lambda x: x not in relevant_hmms, hmms_in_hitstable))
+            hitstable = hitstable.drop(hmms_to_drop, axis=1)
+
 
         #Get order of genomes
         genomes = hitstable['id'].tolist()
