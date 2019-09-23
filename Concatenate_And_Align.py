@@ -141,7 +141,7 @@ def main(args):
     aln_concat = args.aln_concat
     just_concat = args.just_concat
     threshold = args.hits_threshold
-    exclude = args.exclude.split()
+    exclude = args.exclude
     threads = args.threads
     inaccurate = args.inaccurate
     alignment_name = args.aln_name[0]
