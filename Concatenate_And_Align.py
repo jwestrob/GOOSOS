@@ -35,8 +35,9 @@ parser.add_argument('-inaccurate', action='store_true', default=False,
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
                 help="Number of threads to use (helpful for MAFFT).")
 
-def pass_sum_threshold(genome_id, threshold, df, exclude):
-    total = float(len())
+def pass_sum_threshold(genome_id, threshold, df):
+    total = float(len(df.columns.values)) - 1
+    print(total)
     hits_threshold = float(threshold)*total
     num_hits = df[df.id == genome_id].sum(axis=1).tolist()[0]
     if num_hits < hits_threshold:
@@ -188,7 +189,7 @@ def main(args):
         genomes = hitstable['id'].tolist()
 
 
-        genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable, exclude),
+        genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
         if outdir.endswith('/'):
             fastadir = outdir + 'fastas'
