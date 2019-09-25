@@ -106,13 +106,13 @@ def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
     #print(protein_id, hmmfile)
     if not cut_nc and not cut_ga:
         cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
-                + str(1) + ' -E ' + str(threshold) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm $(realpath ' + protfile + ') > /dev/null 2>&1'
+                + str(1) + ' -E ' + str(threshold) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     elif cut_nc:
         cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_nc --cpu ' \
-                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm $(realpath ' + protfile + ') > /dev/null 2>&1'
+                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     elif cut_ga:
         cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_ga --cpu ' \
-                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm $(realpath ' + protfile + ') > /dev/null 2>&1'
+                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     #print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
@@ -417,7 +417,7 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
         os.system('mkdir ' + fastaoutdir)
     #Make symbolic link
     if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
-        os.system('ln -s $(realpath ' + fastafile + ') ' + fastaoutdir + '/')
+        os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
 
     # Run all HMMs for fastafile
     return run_hmmscan(fastafile, outdir, threshold, best, cut_nc, cut_ga)
