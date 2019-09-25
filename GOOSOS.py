@@ -417,7 +417,7 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
         os.system('mkdir ' + fastaoutdir)
     #Make symbolic link
     if len(list(filter(lambda x: '.faa' in x, os.listdir(fastaoutdir)))) == 0:
-        os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
+        os.system('ln -s $(realpath ' + fastafile + ') ' + fastaoutdir + '/')
 
     # Run all HMMs for fastafile
     return run_hmmscan(fastafile, outdir, threshold, best, cut_nc, cut_ga)
