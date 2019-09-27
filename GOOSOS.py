@@ -29,19 +29,22 @@ parser.add_argument('-accurate', default=False, action='store_true', help='If al
 parser.add_argument('-cut_nc', default=False, action='store_true', help='If using KEGG HMMs, use the --cut_nc option during hmmsearch (built in cutoffs)')
 parser.add_argument('-cut_ga', default=False, action='store_true', help='If using PFAM HMMs, use the --cut_ga option during hmmsearch (built in cutoffs)')
 
+#------------------------
+#      FUNCTION ZOO
+#------------------------
 
-def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
+def gather_hmms(hmmlist_wpath, outdir, cut_nc, cut_ga):
     #Concatenate all hmm files together and press them into a binary
     list_of_hmms = ' '.join(hmmlist_wpath)
 
-    #Make folder to store hmmpress files in
-    if not os.path.exists(outdir + '/hmmpress'):
-        os.mkdir(outdir + '/hmmpress')
+    #Make folder to store hmm files in
+    if not os.path.exists(outdir + '/renamed_hmms'):
+        os.mkdir(outdir + '/renamed_hmms')
 
     #Rename the NAME field on each HMM file to be consistent with filename
-    #Since hmmscan labels every hit with whatever's in that field
+    #Since hmmsearch labels every hit with whatever's in that field
     for hmmfile in hmmlist_wpath:
-        rename(hmmfile, outdir + '/hmmpress/')
+        rename(hmmfile, outdir + '/renamed_hmms/')
 
     if cut_nc or cut_ga:
         hmm_thresh_list = []
@@ -73,16 +76,11 @@ def hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga):
     else:
         hmm_thresh_dict = None
 
+    renamed_dir = outdir + '/renamed_hmms/'
 
+    print('cat ' + renamed_dir + '*.hmm > ' + renamed_dir + 'concatenated_hmms.hmm')
 
-
-    hmmpressdir = outdir + '/hmmpress/'
-
-    print('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
-
-    os.system('cat ' + hmmpressdir + '*.hmm > ' + hmmpressdir + 'concatenated_hmms.hmm')
-
-    os.system('hmmpress ' + hmmpressdir + 'concatenated_hmms.hmm')
+    os.system('cat ' + renamed_dir + '*.hmm > ' + renamed_dir + 'concatenated_hmms.hmm')
 
     return hmm_thresh_dict
 
@@ -97,27 +95,26 @@ def rename(hmmfile, hmmdir):
             f.write("%s\n" % item)
     return
 
-def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
+def run_hmmsearch(protfile, outdir, threshold, best, cut_nc, cut_ga):
     genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
-
-    if len(list(filter(lambda x: '_hmmsearch.out' in x, os.listdir(outdir + '/hmmscan/' + '/')))) > 0:
+    if len(list(filter(lambda x: '_hmmsearch.out' in x, os.listdir(outdir + '/hmmsearch/' + '/')))) > 0:
         return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
 
     #print(protein_id, hmmfile)
     if not cut_nc and not cut_ga:
-        cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
-                + str(1) + ' -E ' + str(threshold) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+        cmd = 'hmmsearch --domtblout ' + outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cpu ' \
+                + str(1) + ' -E ' + str(threshold) + ' ' + outdir + '/renamed_hmms/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     elif cut_nc:
-        cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_nc --cpu ' \
-                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+        cmd = 'hmmsearch --domtblout ' + outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_nc --cpu ' \
+                + str(1) + ' ' + outdir + '/renamed_hmms/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     elif cut_ga:
-        cmd = 'hmmscan --domtblout ' + outdir + '/hmmscan/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_ga --cpu ' \
-                + str(1) + ' ' + outdir + '/hmmpress/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
+        cmd = 'hmmsearch --domtblout ' + outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '_hmmsearch.out  --notextw --cut_ga --cpu ' \
+                + str(1) + ' ' + outdir + '/renamed_hmms/concatenated_hmms.hmm ' + protfile + ' > /dev/null 2>&1'
     #print(cmd)
     result = subprocess.run(cmd, shell=True, check=True)
     if result.returncode != 0:
         print(result)
-        print('HMMscan error (check for empty sequences in your protein FASTAs)')
+        print('HMMsearch error (check for empty sequences in your protein FASTAs)')
         print('genome_id: ', genome_id)
         #print('hmmfile: ', hmmfile)
         sys.exit()
@@ -125,10 +122,9 @@ def run_hmmscan(protfile, outdir, threshold, best, cut_nc, cut_ga):
     #Parse file with awk/perl nonsense; generate .parse file
     return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
 
-
 def get_rec_for_hit(genome_id, orf, outdir):
     genome_id = str(genome_id)
-    genome_dir = outdir + '/hmmscan/' + genome_id + '/'
+    genome_dir = outdir + '/hmmsearch/' + genome_id + '/'
     protfile = list(filter(lambda x: '.faa' in x or '.fa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
 
@@ -227,14 +223,14 @@ def run_prodigal(fastafile_wpath, outdir):
 def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
     """
-    Takes output file from HMMscan (--domtblout), parses it, and yields a
+    Takes output file from HMMsearch (--domtblout), parses it, and yields a
     genome-specific dataframe of each hit (above the evalue threshold) for each
     domain.
     Now contains bitscore information as well.
     """
 
     genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
-    hmmoutfile_wpath = outdir + '/hmmscan/' + genome_id + '/' + hmmoutfile
+    hmmoutfile_wpath = outdir + '/hmmsearch/' + genome_id + '/' + hmmoutfile
 
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
@@ -255,8 +251,8 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
                           'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
                           'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
         empty_df = pd.DataFrame(columns = orflist_header)
-        empty_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
-        return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
+        empty_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
+        return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse'
 
     #Remove newline characters and split by whitespace
     lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
@@ -374,9 +370,9 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
 
 
-    orf_df.to_csv(outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
+    orf_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
 
-    return outdir + '/hmmscan/' + genome_id + '/' + genome_id + '.parse'
+    return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse'
 
 def align_fn(fastafile_wpath, outdir, threads, accurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
@@ -392,9 +388,9 @@ def align_fn(fastafile_wpath, outdir, threads, accurate):
 
 def fetch_outfiles(outdir, threshold, threads, best):
     p = Pool(threads)
-    hmmscandir = os.path.join(outdir, 'hmmscan')
-    subdirectories = os.listdir(hmmscandir)
-    subdirectories_wpath = list(map(lambda dir: os.path.join(hmmscandir, dir), subdirectories))
+    hmmsearchdir = os.path.join(outdir, 'hmmsearch')
+    subdirectories = os.listdir(hmmsearchdir)
+    subdirectories_wpath = list(map(lambda dir: os.path.join(hmmsearchdir, dir), subdirectories))
 
     def get_outfile(dir):
         all_files = os.listdir(dir)
@@ -410,7 +406,7 @@ def fetch_outfiles(outdir, threshold, threads, best):
 
 def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
 
-    fastaoutdir = outdir + '/hmmscan/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
+    fastaoutdir = outdir + '/hmmsearch/' + fastafile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fasta')[0].split('.fa')[0]
 
     # Make outdir for HMMs
     if not os.path.exists(fastaoutdir):
@@ -420,7 +416,7 @@ def run_hmms(fastafile, outdir, threshold, best, cut_nc, cut_ga):
         os.system('ln -s ' + fastafile + ' ' + fastaoutdir + '/')
 
     # Run all HMMs for fastafile
-    return run_hmmscan(fastafile, outdir, threshold, best, cut_nc, cut_ga)
+    return run_hmmsearch(fastafile, outdir, threshold, best, cut_nc, cut_ga)
 
 def mark_with_threshold(all_df, hmm_thresh_dict):
 
@@ -482,8 +478,10 @@ def main():
     hmmlist = list(map(lambda file: file.split('.hmm')[0], filter(lambda x: x.endswith('.hmm'),os.listdir(hmmdir))))
 
     if not already_scanned:
-        #Generate binary files for hmmsearch
-        hmm_thresh_dict = hmmpress(hmmlist_wpath, outdir, cut_nc, cut_ga)
+        #Previous workflow used hmmsearch
+            #Generate binary files for hmmsearch
+            #hmm_thresh_dict = hmmprfess(hmmlist_wpath, outdir, cut_nc, cut_ga)
+        hmm_thresh_dict = gather_hmms(hmmlist_wpath, outdir, cut_nc, cut_ga)
         np.save(os.path.join(outdir, 'hmm_thresh_dict.npy'), hmm_thresh_dict)
     else:
         np.load(os.path.join(outdir, 'hmm_thresh_dict.npy'), allow_pickle=True)
@@ -513,8 +511,8 @@ def main():
                         protlist_wpath))
 
         #Make directory to store hmmsearch outfiles
-        if not os.path.exists(outdir + '/hmmscan/'):
-            os.system('mkdir ' + outdir + '/hmmscan/')
+        if not os.path.exists(outdir + '/hmmsearch/'):
+            os.system('mkdir ' + outdir + '/hmmsearch/')
 
         #Make sure you get rid of any Nones
         parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
