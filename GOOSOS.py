@@ -235,9 +235,11 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     with open(hmmoutfile_wpath, 'r') as infile:
         lines = infile.readlines()
 
-    domtbl_header = ['target name', 'accession', 'tlen', 'query name', 'accession', 'qlen', 'E-value',
-                    'full_score',  'full_bias',   'dom_#',  'dom_of',  'c-Evalue',  'i-Evalue',  'dom_score',  'dom_bias',  'hmm_from',
-                    'hmm_to',  'ali_from', 'ali_to',  'env_from', 'env_to',  'mean_posterior', 'description of target']
+    domtbl_header = ['orf_id', 'accession', 'seqlen', 'family_hmm',
+                'accession', 'hmm_len', 'overall_evalue', 'overall_bitscore', 'bias',
+                'num_domains', 'num_domains_2', 'dom_cond_evalue', 'dom_ind_evalue',
+                'dom_bitscore', 'dom_bias', 'hmm_start', 'hmm_end', 'seq_start', 'seq_end',
+                'env_start', 'env_end', 'acc']
 
     desired_header = ['family_hmm', 'hmm_length', 'orf_id',
                       'query_length', 'bitscore', 'evalue', 'hmm_start',
@@ -270,19 +272,19 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     #Make DF to store properly arranged data
     goodheader_df = pd.DataFrame(columns=desired_header)
 
-    goodheader_df['family_hmm'] = lines_df['target name']
+    goodheader_df['orf_id'] = lines_df['orf_id']
     #Insert genome ID to avoid confusion
     goodheader_df['genome_id'] = pd.Series([genome_id]*len(lines_df))
-    goodheader_df['hmm_length'] = lines_df['tlen']
-    goodheader_df['orf_id'] = lines_df['query name']
-    goodheader_df['query_length'] = lines_df['qlen']
-    goodheader_df['bitscore'] = lines_df['full_score']
-    goodheader_df['evalue'] = lines_df['E-value']
-    goodheader_df['c_evalue'] = lines_df['c-Evalue']
-    goodheader_df['hmm_start'] = lines_df['hmm_from']
-    goodheader_df['hmm_end'] = lines_df['hmm_to']
-    goodheader_df['query_start'] = lines_df['ali_from']
-    goodheader_df['query_end'] = lines_df['ali_to']
+    goodheader_df['hmm_length'] = lines_df['hmm_len']
+    goodheader_df['family_hmm'] = lines_df['family_hmm']
+    goodheader_df['query_length'] = lines_df['seqlen']
+    goodheader_df['bitscore'] = lines_df['overall_bitscore']
+    goodheader_df['evalue'] = lines_df['overall_evalue']
+    goodheader_df['c_evalue'] = lines_df['dom_cond_evalue']
+    goodheader_df['hmm_start'] = lines_df['hmm_start']
+    goodheader_df['hmm_end'] = lines_df['hmm_end']
+    goodheader_df['query_start'] = lines_df['seq_start']
+    goodheader_df['query_end'] = lines_df['seq_end']
 
     unique_orfs = goodheader_df['orf_id'].unique()
     #print("Unique orfs: ")
