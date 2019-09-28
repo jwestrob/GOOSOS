@@ -249,10 +249,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     lines_filtered = list(filter(lambda x: x[0] != '#', lines))
     if len(lines_filtered) == 0:
         print("No hits for " + genome_id)
-        orflist_header = ['family_hmm', 'hmm_length', 'orf_id', 'overall_bitscore', 'overall_evalue', 'dom1_evalue', 'dom1_hmmstart',
-                          'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_evalue', 'dom2_hmmstart',
-                          'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
-        empty_df = pd.DataFrame(columns = orflist_header)
+        empty_df = pd.DataFrame(columns = desired_header)
         empty_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
         return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse'
 
@@ -261,7 +258,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
     #Python, by default, splits the description at the end, causing dimension mismatch.
     #Let's get rid of the extra elements.
-    lines_filtered = list(map(lambda x: x[0:23], lines_filtered))
+    lines_filtered = list(map(lambda x: x[0:22], lines_filtered))
 
     #Make pandas DF to store lines, then add column names
     try:
