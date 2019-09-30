@@ -173,7 +173,8 @@ def main(args):
         hitstable.columns.values[0] = 'id'
 
         #Drop columns for HMMs that are excluded
-        hitstable = hitstable.drop(exclude, axis=1)
+        if exclude is not None:
+            hitstable = hitstable.drop(exclude, axis=1)
 
         hmms_in_hitstable = hitstable.columns.values[1:]
 
