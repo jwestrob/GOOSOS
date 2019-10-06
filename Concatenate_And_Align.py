@@ -37,7 +37,6 @@ parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
 
 def pass_sum_threshold(genome_id, threshold, df):
     total = float(len(df.columns.values)) - 1
-    print(total)
     hits_threshold = float(threshold)*total
     num_hits = df[df.id == genome_id].sum(axis=1).tolist()[0]
     if num_hits < hits_threshold:
@@ -173,7 +172,8 @@ def main(args):
         hitstable.columns.values[0] = 'id'
 
         #Drop columns for HMMs that are excluded
-        hitstable = hitstable.drop(exclude, axis=1)
+        if exclude is not None:
+            hitstable = hitstable.drop(exclude, axis=1)
 
         hmms_in_hitstable = hitstable.columns.values[1:]
 
@@ -206,7 +206,7 @@ def main(args):
 
 
         all_hits_filtered = all_df[all_df.genome_id.isin(genomes_passed_threshold)]
-        orf_id_list = all_df.orf_id.apply(lambda x: x.split('|')[-1]).unique().tolist()
+        orf_id_list = all_hits_filtered.orf_id.apply(lambda x: x.split('|')[-1]).unique().tolist()
 
         if len(all_hits_filtered) == 0:
             print("WHOOPS1")
