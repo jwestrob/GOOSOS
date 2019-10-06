@@ -273,7 +273,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     #Insert genome ID to avoid confusion
     goodheader_df['genome_id'] = pd.Series([genome_id]*len(lines_df))
     goodheader_df['hmm_length'] = lines_df['hmm_len']
-    goodheader_df['num_domains'] = lines_df['num_domains']
+    goodheader_df['num_domains'] = lines_df['num_domains_2']
     goodheader_df['family_hmm'] = lines_df['family_hmm']
     goodheader_df['query_length'] = lines_df['seqlen']
     goodheader_df['bitscore'] = lines_df['overall_bitscore']
@@ -543,7 +543,7 @@ def main():
             parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
 
             all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
-            
+
             all_df = pd.concat(all_df_list, sort=False)
 
             all_df.to_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t', index=False)
