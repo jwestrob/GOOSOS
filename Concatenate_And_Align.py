@@ -220,6 +220,7 @@ def main(args):
         lengths = []
         all_orf_ids = []
 
+
         for index, fastafile in enumerate(fastas_recs):
             fastaname = fastas_only[index].split('_hits.faa')[0]
             red_df = all_df[all_df.family_hmm == fastaname]
@@ -240,6 +241,7 @@ def main(args):
             print("sum(lengths): ", sum(lengths))
             print("len(orf_id_list): ", len(orf_id_list))
             all_orf_ids = flatten(all_orf_ids)
+            print(pd.Series(all_orf_ids).duplicated())
             if sum(lengths) < len(orf_id_list):
                 not_in_goodset = list(filter(lambda x: x not in all_orf_ids, orf_id_list))
                 print(not_in_goodset[0:5])
