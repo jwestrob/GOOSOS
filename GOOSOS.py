@@ -295,7 +295,7 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
     for orf in unique_orfs:
         red_df = goodheader_df[goodheader_df['orf_id'] == orf]
 
-        #For the unlikely scenario where you have more than one HMM hit on a single ORF xfor ONE HMM
+        #For the unlikely scenario where you have more than one HMM hit on a single ORF for ONE HMM
         if len(red_df['family_hmm'].unique()) > 1:
             #You want ascending=True because you want the smallest values first
             sorted_red = red_df.sort_values(by='evalue', ascending=True)
@@ -517,7 +517,9 @@ def main():
             os.system('mkdir ' + outdir + '/hmmsearch/')
 
         #Make sure you get rid of any Nones
-        parsed_hmm_outfiles = list(filter(lambda x: x is not None, list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga), protlist_wpath))))
+        parsed_hmm_outfiles = list(filter(lambda x: x is not None,
+                                    list(p.map(lambda x: run_hmms(x, outdir, threshold, best, cut_nc, cut_ga),
+                                    protlist_wpath))))
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df_init = pd.concat(all_df_list, sort=False)
