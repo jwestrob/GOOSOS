@@ -588,7 +588,7 @@ def main():
 
 
     prot_series = pd.Series(protlist)
-    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=None)
+    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=False)
 
     print("Order of sorted fastas written to genome_order.txt.")
 
