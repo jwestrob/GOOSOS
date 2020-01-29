@@ -376,6 +376,89 @@ def parse_hmmdomtbl(outdir, hmmoutfile, threshold, best):
 
     return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse'
 
+def parse_hmmdomtbl_multidomain(outdir, hmmoutfile, threshold):
+
+    """
+    Takes output file from HMMsearch (--domtblout), parses it, and yields a
+    genome-specific dataframe of each hit (above the evalue threshold) for each
+    domain.
+    """
+
+    genome_id = hmmoutfile.split('_hmmsearch.out')[0].split('.fasta')[0].split('.fna')[0].split('.fa')[0]
+    hmmoutfile_wpath = outdir + '/hmmsearch/' + genome_id + '/' + hmmoutfile
+
+    with open(hmmoutfile_wpath, 'r') as infile:
+        lines = infile.readlines()
+
+    domtbl_header = ['orf_id', 'accession', 'seqlen', 'family_hmm',
+                'accession', 'hmm_len', 'overall_evalue', 'overall_bitscore', 'bias',
+                'num_domains', 'num_domains_2', 'dom_cond_evalue', 'dom_ind_evalue',
+                'dom_bitscore', 'dom_bias', 'hmm_start', 'hmm_end', 'seq_start', 'seq_end',
+                'env_start', 'env_end', 'acc']
+
+    desired_header = ['family_hmm', 'hmm_length', 'orf_id',
+                      'query_length', 'bitscore', 'evalue', 'num_domains', 'hmm_start',
+                      'hmm_end', 'query_start', 'query_end']
+
+    #Remove all lines with '#' beginning character
+    lines_filtered = list(filter(lambda x: x[0] != '#', lines))
+    if len(lines_filtered) == 0:
+        print("No hits for " + genome_id)
+        empty_df = pd.DataFrame(columns = desired_header)
+        empty_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse', sep='\t', index=False)
+        return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.parse'
+
+    #Remove newline characters and split by whitespace
+    lines_filtered = list(map(lambda x: x.strip('\n').split(), lines_filtered))
+
+    #Python, by default, splits the description at the end, causing dimension mismatch.
+    #Let's get rid of the extra elements.
+    lines_filtered = list(map(lambda x: x[0:22], lines_filtered))
+
+    #Make pandas DF to store lines, then add column names
+    try:
+	    lines_df = pd.DataFrame(lines_filtered, columns=domtbl_header)
+    except:
+           print("Error parsing hmmdomtbl for: ", genome_id)
+           sys.exit()
+    #Make DF to store properly arranged data
+    goodheader_df = pd.DataFrame(columns=desired_header)
+
+    goodheader_df['orf_id'] = lines_df['orf_id']
+    #Insert genome ID to avoid confusion
+    goodheader_df['genome_id'] = pd.Series([genome_id]*len(lines_df))
+
+    goodheader_df['hmm_length'] = lines_df['hmm_len']
+    goodheader_df['num_domains'] = lines_df['num_domains_2']
+    goodheader_df['family_hmm'] = lines_df['family_hmm']
+    goodheader_df['query_length'] = lines_df['seqlen']
+    goodheader_df['bitscore'] = lines_df['overall_bitscore']
+    goodheader_df['evalue'] = lines_df['overall_evalue']
+    goodheader_df['c_evalue'] = lines_df['dom_cond_evalue']
+    goodheader_df['hmm_start'] = lines_df['hmm_start']
+    goodheader_df['hmm_end'] = lines_df['hmm_end']
+    goodheader_df['query_start'] = lines_df['seq_start']
+    goodheader_df['query_end'] = lines_df['seq_end']
+
+    unique_orfs = goodheader_df['orf_id'].unique()
+    #print("Unique orfs: ")
+    #print(unique_orfs)
+
+    orflist = []
+    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'query_length', 'num_domains', 'overall_bitscore', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
+                      'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_cevalue', 'dom2_hmmstart',
+                      'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
+
+    goodheader_df = goodheader_df[goodheader_df['overall_evalue'].astype(float) <= threshold]
+    goodheader_df = goodheader_df[orfgoodheader_df_df['query_length'].astype(float) >= 0.75*orf_df['hmm_length'].astype(float)]
+
+
+
+
+    goodheader_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse', sep='\t', index=False)
+
+    return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse'
+
 def align_fn(fastafile_wpath, outdir, threads, accurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
     if accurate:
@@ -402,6 +485,8 @@ def fetch_outfiles(outdir, threshold, threads, best):
     hmmoutfiles = list(map(get_outfile, subdirectories_wpath))
 
     parsed_hmm_outfiles = list(p.map(lambda outfile: parse_hmmdomtbl(outdir, outfile, threshold, best),
+                                     hmmoutfiles))
+    parsed_hmm_outfiles_multidomain = list(p.map(lambda outfile: parse_hmmdomtbl_multidomain(outdir, outfile, threshold),
                                      hmmoutfiles))
     return parsed_hmm_outfiles
 
@@ -588,7 +673,7 @@ def main():
 
 
     prot_series = pd.Series(protlist)
-    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=None)
+    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=False)
 
     print("Order of sorted fastas written to genome_order.txt.")
 
