@@ -440,21 +440,9 @@ def parse_hmmdomtbl_multidomain(outdir, hmmoutfile, threshold):
     goodheader_df['query_start'] = lines_df['seq_start']
     goodheader_df['query_end'] = lines_df['seq_end']
 
-    unique_orfs = goodheader_df['orf_id'].unique()
-    #print("Unique orfs: ")
-    #print(unique_orfs)
-
-    orflist = []
-    orflist_header = ['family_hmm', 'genome_id', 'orf_id', 'hmm_length', 'query_length', 'num_domains', 'overall_bitscore', 'overall_evalue', 'dom1_cevalue', 'dom1_hmmstart',
-                      'dom1_hmmend', 'dom1_querystart', 'dom1_queryend', 'dom2_cevalue', 'dom2_hmmstart',
-                      'dom2_hmmend', 'dom2_querystart', 'dom2_queryend']
-
     goodheader_df = goodheader_df[goodheader_df['overall_evalue'].astype(float) <= threshold]
     goodheader_df = goodheader_df[orfgoodheader_df_df['query_length'].astype(float) >= 0.75*orf_df['hmm_length'].astype(float)]
-
-
-
-
+    print('HITTING THE RIGHT PART')
     goodheader_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse', sep='\t', index=False)
 
     return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse'
