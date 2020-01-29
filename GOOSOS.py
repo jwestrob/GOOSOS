@@ -434,8 +434,8 @@ def parse_hmmdomtbl_multidomain(outdir, hmmoutfile, threshold):
     goodheader_df['family_hmm'] = lines_df['family_hmm']
     goodheader_df['query_length'] = lines_df['seqlen']
     goodheader_df['bitscore'] = lines_df['overall_bitscore']
-    goodheader_df['evalue'] = lines_df['overall_evalue']
-    goodheader_df['c_evalue'] = lines_df['dom_cond_evalue']
+    goodheader_df['overall_evalue'] = lines_df['overall_evalue']
+    goodheader_df['dom_c_evalue'] = lines_df['dom_cond_evalue']
     goodheader_df['hmm_start'] = lines_df['hmm_start']
     goodheader_df['hmm_end'] = lines_df['hmm_end']
     goodheader_df['query_start'] = lines_df['seq_start']
@@ -443,7 +443,7 @@ def parse_hmmdomtbl_multidomain(outdir, hmmoutfile, threshold):
 
     goodheader_df = goodheader_df[goodheader_df['overall_evalue'].astype(float) <= threshold]
     goodheader_df = goodheader_df[orfgoodheader_df_df['query_length'].astype(float) >= 0.75*orf_df['hmm_length'].astype(float)]
-    print('HITTING THE RIGHT PART')
+
     goodheader_df.to_csv(outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse', sep='\t', index=False)
 
     return outdir + '/hmmsearch/' + genome_id + '/' + genome_id + '.allhits.parse'
