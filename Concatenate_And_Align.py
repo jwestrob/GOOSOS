@@ -255,7 +255,6 @@ def main(args):
 
 
             print("WHOOPS")
-            sys.exit()
         else:
             print("OK!")
 
