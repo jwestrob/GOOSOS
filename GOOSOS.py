@@ -97,8 +97,8 @@ def rename(hmmfile, hmmdir):
 
 def run_hmmsearch(protfile, outdir, threshold, best, cut_nc, cut_ga):
     genome_id = protfile.split('/')[-1].split('.faa')[0].split('.fna')[0].split('.fa')[0].split('.fasta')[0]
-    if len(list(filter(lambda x: '_hmmsearch.out' in x, os.listdir(outdir + '/hmmsearch/' + '/')))) > 0:
-        return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
+    #if len(list(filter(lambda x: '_hmmsearch.out' in x, os.listdir(outdir + '/hmmsearch/' + '/')))) > 0:
+    #    return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
 
     #print(protein_id, hmmfile)
     if not cut_nc and not cut_ga:
