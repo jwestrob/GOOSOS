@@ -667,6 +667,7 @@ def main():
     print("Order of sorted fastas written to genome_order.txt.")
 
     print("You did it!")
+    sys.exit()
 
 if __name__ == "__main__":
     main()
