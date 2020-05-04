@@ -69,7 +69,7 @@ def gather_hmms(hmmlist_wpath, outdir, cut_nc, cut_ga):
                 #Grab threshold from middle element
                 ga = ga[0].split()[1]
 
-            thresh  = max(nc, ga)
+            thresh  = max(float(nc), float(ga))
             hmm_thresh_list.append([hmmname, thresh])
 
         hmm_thresh_dict = dict(hmm_thresh_list)
