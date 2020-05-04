@@ -59,7 +59,7 @@ def gather_hmms(hmmlist_wpath, outdir, cut_nc, cut_ga):
                 nc = 0
             else:
                 #Grab threshold from middle element
-                nc = nc[0].split()[1]
+                float(nc = nc[0].split()[1])
 
             ga = list(filter(lambda x: x.startswith('GA'), lines))
 
@@ -67,7 +67,7 @@ def gather_hmms(hmmlist_wpath, outdir, cut_nc, cut_ga):
                 ga = 0
             else:
                 #Grab threshold from middle element
-                ga = ga[0].split()[1]
+                float(ga = ga[0].split()[1])
 
             thresh  = max(float(nc), float(ga))
             hmm_thresh_list.append([hmmname, thresh])
