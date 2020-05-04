@@ -32,6 +32,7 @@ parser.add_argument('-hits_threshold', metavar='[Lower threshold for num hits]',
                 order to be included in the final alignment. Default: 50 (0.5)")
 parser.add_argument('-inaccurate', action='store_true', default=False,
                 help="Use faster (less accurate) parameters for MAFFT.")
+parser.add_argument('-famsa', action='store_true', default=False, help="Use FAMSA, the superior alignment software")
 parser.add_argument('-threads', metavar='[NUM THREADS]', default=1,
                 help="Number of threads to use (helpful for MAFFT).")
 
@@ -44,8 +45,11 @@ def pass_sum_threshold(genome_id, threshold, df):
     else:
         return True
 
-def align_fn(fastafile_wpath, outdir, threads, inaccurate):
+def align_fn(fastafile_wpath, outdir, threads, famsa, inaccurate):
     fastafile_id = fastafile_wpath.split('/')[-1].split('.faa')[0]
+    if famsa:
+        os.system('famsa -t ' + str(threads) + ' ' + fastafile_wpath + ' ' + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
+        return
     if not inaccurate:
         #print('mafft --localpair --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > ' + outdir + '/alignments/' + fastafile_id + '_ALN.mfaa')
         os.system('mafft --localpair --reorder --thread ' + str(threads) + ' --maxiterate 1000 ' + fastafile_wpath + ' > '
@@ -145,6 +149,7 @@ def main(args):
     threads = args.threads
     inaccurate = args.inaccurate
     alignment_name = args.aln_name[0]
+    famsa = args.famsa
 
     if threshold is not None and just_concat == True:
         print("Since you specified the -just_concat flag, the threshold will not be used to filter.")
@@ -280,7 +285,7 @@ def main(args):
             print("Beginning alignments...")
             if not os.path.exists(outdir + '/alignments'):
                 os.system('mkdir ' + outdir + '/alignments')
-            list(map(lambda x: align_fn(x, outdir, threads, inaccurate), filtered_fastas_wpath))
+            list(map(lambda x: align_fn(x, outdir, threads, famsa, inaccurate), filtered_fastas_wpath))
 
     alignments_dir = outdir + '/alignments'
     alignments = list(filter(lambda x: 'ALN' in x, os.listdir(alignments_dir)))
@@ -317,7 +322,7 @@ def main(args):
     #Concatenate and make final alignment
     concatenate(alignments_recs_sorted, alignment_name, alignments_dir)
 
-
+    sys.exit()
 
 if __name__ == "__main__":
     args = parser.parse_args()
