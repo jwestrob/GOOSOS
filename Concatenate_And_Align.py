@@ -193,9 +193,11 @@ def main(args):
         #Get order of genomes
         genomes = hitstable['id'].tolist()
 
-
-        genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
+        if float(threshold) > 0:
+            genomes_passed_threshold = list(filter(lambda genome_id: pass_sum_threshold(genome_id, threshold, hitstable),
                                                               genomes))
+        else:
+            genomes_passed_threshold = genomes
         if outdir.endswith('/'):
             fastadir = outdir + 'fastas'
         else:
