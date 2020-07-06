@@ -127,9 +127,9 @@ def get_rec_for_hit(genome_id, orf, outdir):
     genome_id = str(genome_id)
     genome_dir = outdir + '/hmmsearch/' + genome_id + '/'
     protfile = list(filter(lambda x: '.faa' in x or '.fa' in x, os.listdir(genome_dir)))[0]
-    genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
+    genome_generator = SeqIO.parse(genome_dir + protfile, 'fasta')
     try:
-        desired_hit = list(filter(lambda x: orf == x.id, genome_recs))[0]
+        desired_hit = list(filter(lambda x: orf == x.id, genome_generator))[0]
     except IndexError:
         return None
     if not desired_hit.id.startswith(genome_id + '|'):
