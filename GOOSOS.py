@@ -128,8 +128,10 @@ def get_rec_for_hit(genome_id, orf, outdir):
     genome_dir = outdir + '/hmmsearch/' + genome_id + '/'
     protfile = list(filter(lambda x: '.faa' in x or '.fa' in x, os.listdir(genome_dir)))[0]
     genome_recs = list(SeqIO.parse(genome_dir + protfile, 'fasta'))
-
-    desired_hit = list(filter(lambda x: orf == x.id, genome_recs))[0]
+    try:
+        desired_hit = list(filter(lambda x: orf == x.id, genome_recs))[0]
+    except IndexError:
+        return None
     if not desired_hit.id.startswith(genome_id + '|'):
         desired_hit.id = genome_id + '|' + desired_hit.id
 
@@ -143,7 +145,7 @@ def extract_hits_by_hmm(red_df, threads, outdir):
     id_orf_list = red_df[['genome_id', 'orf_id']].values.tolist()
 
     recs = list(p2.map(lambda id_orf: get_rec_for_hit(id_orf[0], id_orf[1], outdir), id_orf_list))
-
+    recs = list(filter(lambda x: x is not None, recs))
     return recs
 
 def extract_hits(all_df, threads, outdir):
