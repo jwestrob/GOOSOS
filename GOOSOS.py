@@ -1,6 +1,6 @@
 from pathos.multiprocessing import ProcessingPool as Pool
 from Bio.SeqRecord import SeqRecord
-from Bio import SeqIO, SearchIO
+from Bio import SeqIO
 from Bio.Alphabet import IUPAC
 import os, sys, pandas as pd
 from pathlib import Path
