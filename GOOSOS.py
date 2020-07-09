@@ -199,6 +199,47 @@ def extract_hits_2(all_df, threads, outdir):
 
     return recs_by_hmm
 
+def extract_hits_3(all_df, threads, outdir):
+    os.system('mkdir ' + os.path.join(outdir, 'pullseq_tmp'))
+
+    #Takes all_df and generates recs for each HMM by extracting with pullseq
+
+    genome_tmp = os.system('mkdir ' + os.path.join(outdir, 'pullseq_tmp/genome_fastas'))
+    orfids_tmp = os.system('mkdir ' + os.path.join(outdir, 'pullseq_tmp/orfids_by_genome'))
+
+    recs_by_file = []
+    recs_by_hmm = []
+
+    def grab_recs_by_genome(genome_id, outdir=outdir, genome_tmp=genome_tmp, orfids_tmp=orfids_tmp):
+        #Get all ORFs corresponding to that genome/input file
+        desired_orfs = all_df[all_df.genome_id == genome_id].orf_id.tolist()
+        genome_dir = outdir + '/hmmsearch/' + genome_id + '/'
+        #Grab protein file from directory within hmmsearch folder
+        protfile = list(filter(lambda x: x.endswith('.faa') or x.endswith('.fa'), os.listdir(genome_dir)))[0]
+
+        with open(os.path.join(orfids_tmp, genome_id + '.txt'), 'w') as outfile:
+            for element in desired_orfs:
+                outfile.writelines(element + '\n')
+
+        os.system('pullseq -i ' + os.path.join(genome_dir, protfile) + ' -n ' + os.path.join(orfids_tmp, genome_id + '.txt > ' + genome_tmp + '/' + genome_id + 'allhits.faa'))
+        genome_recs = list(SeqIO.parse(os.path.join(genome_tmp, 'allhits.faa'), 'fasta'))
+        return genome_recs
+
+        p2 = Pool(threads)
+        recs_by_file = list(p2.map(grab_recs_by_genome,  all_df.genome_id.unique().tolist()))
+
+
+    flatten = lambda l: [item for sublist in l for item in sublist]
+
+    all_recs = flatten(recs_by_file)
+
+    for hmm in all_df.family_hmm.unique().tolist():
+        desired_orfs_2 = all_df[all_df.family_hmm == hmm].orf_id.tolist()
+        hmm_recs = list(filter(lambda x: x.id in desired_orfs_2, all_recs))
+        recs_by_hmm.append([hmm_recs, hmm])
+
+    return recs_by_hmm
+
 def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
     # Make matrix of zeros to store hits
