@@ -276,7 +276,7 @@ def extract_hits_4(all_df, threads, protdir, outdir):
 
     p2 = Pool(threads)
     print("Fetching orfs...")
-    recs_by_file = list(p2.map(grab_recs_by_hmm,  all_df.family_hmm.unique().tolist()))
+    recs_by_hmm = list(p2.map(grab_recs_by_hmm,  all_df.family_hmm.unique().tolist()))
     os.system('rm -rf ' + orfids_tmp)
 
 
