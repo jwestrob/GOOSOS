@@ -272,17 +272,17 @@ def extract_hits_4(all_df, threads, protdir, outdir):
             pullseq_cmd = 'cat ' + idfile + ' | pullseq -i ' + genome_file + ' -N >> ' + hits_fasta
             os.system(pullseq_cmd)
 
-        return [list(SeqIO.parse(hits_fasta, 'fasta')), hmm]
+        return [all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm]
 
     p2 = Pool(threads)
     print("Fetching orfs...")
-    recs_by_hmm = list(p2.map(grab_recs_by_hmm,  all_df.family_hmm.unique().tolist()))
+    rec_ids_by_hmm = list(p2.map(grab_recs_by_hmm,  all_df.family_hmm.unique().tolist()))
     os.system('rm -rf ' + orfids_tmp)
 
 
-    return recs_by_hmm
+    return rec_ids_by_hmm
 
-def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
+def make_hitstable_df(rec_ids_by_hmm, hmmlist, fastalist, outdir):
 
     # Make matrix of zeros to store hits
     print("Making hits matrix...")
@@ -294,14 +294,14 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
     hits.index = fastalist
 
     # Mark hits in table
-    for hmm_recs, hmm in recs_by_hmm:
+    for hmm_recs, hmm in rec_ids_by_hmm:
 
         hmm_idx = hmmlist.index(hmm)
 
         for genome_hit in hmm_recs:
             #Extract genome ID from fasta header
             try:
-                genome_id = genome_hit.id.split('|')[0]
+                genome_id = genome_hit.split('|')[0]
             except:
                 print(genome_id)
                 print(type(genome_id))
@@ -752,12 +752,13 @@ def main():
 
 
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
-    recs_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
-    #Make directory to store fasta hits
-    if not os.path.exists(outdir + '/' + 'fastas'):
-        os.system('mkdir ' + outdir + '/' + 'fastas')
+    if not no_seqs:
+        rec_ids_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
 
-    make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
+        make_hitstable_df(rec_ids_list_by_hmm, hmmlist, protlist, outdir)
+    else:
+        rec_ids_list_by_hmm = [[all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm] for hmm in all_df.family_hmm.unique()]
+        make_hitstable_df(rec_ids_list_by_hmm, hmmlist, protlist, outdir)
 
     if not no_seqs:
         #print("Getting recs and writing to fasta...")
