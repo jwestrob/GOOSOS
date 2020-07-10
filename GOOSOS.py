@@ -713,7 +713,7 @@ def main():
 
 
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
-    recs_list_by_hmm = extract_hits_2(all_df, threads, outdir)
+    recs_list_by_hmm = extract_hits_3(all_df, threads, outdir)
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
