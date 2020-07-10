@@ -242,7 +242,7 @@ def extract_hits_3(all_df, threads, outdir):
         hmm_recs = list(filter(lambda x: x.id in desired_orfs_2, all_recs))
         return([hmm_recs, hmm])
 
-    recs_by_hmm = list(p2.map(separate_orfs, all_recs))
+    recs_by_hmm = list(p2.map(separate_orfs, all_df.family_hmm.tolist()))
 
     return recs_by_hmm
 
