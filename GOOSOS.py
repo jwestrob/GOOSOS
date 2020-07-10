@@ -752,7 +752,7 @@ def main():
 
 
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
-    recs_list_by_hmm = extract_hits_4(all_df, threads, outdir)
+    recs_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
@@ -760,8 +760,8 @@ def main():
     make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
 
     if not no_seqs:
-        print("Getting recs and writing to fasta...")
-
+        #print("Getting recs and writing to fasta...")
+        """
         hmms_written = list(map(lambda hits:
                                         write_recs(
                                         #Actual list of recs
@@ -771,7 +771,7 @@ def main():
                                         outdir),
                                         #List of recs to iterate over
                                         recs_list_by_hmm))
-
+        """
         if align:
             out_fastas = os.listdir(outdir + '/fastas')
             out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
@@ -779,10 +779,10 @@ def main():
             list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
 
 
-    prot_series = pd.Series(protlist)
-    prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=False)
+    #prot_series = pd.Series(protlist)
+    #prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=False)
 
-    print("Order of sorted fastas written to genome_order.txt.")
+    #print("Order of sorted fastas written to genome_order.txt.")
 
     print("You did it!")
     sys.exit()
