@@ -225,8 +225,8 @@ def extract_hits_3(all_df, threads, outdir):
         genome_recs = list(SeqIO.parse(os.path.join(genome_tmp, 'allhits.faa'), 'fasta'))
         return genome_recs
 
-        p2 = Pool(threads)
-        recs_by_file = list(p2.map(grab_recs_by_genome,  all_df.genome_id.unique().tolist()))
+    p2 = Pool(threads)
+    recs_by_file = list(p2.map(grab_recs_by_genome,  all_df.genome_id.unique().tolist()))
 
 
     flatten = lambda l: [item for sublist in l for item in sublist]
