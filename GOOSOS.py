@@ -204,8 +204,11 @@ def extract_hits_3(all_df, threads, outdir):
 
     #Takes all_df and generates recs for each HMM by extracting with pullseq
 
-    genome_tmp = os.system('mkdir ' + os.path.join(outdir, 'pullseq_tmp/genome_fastas'))
-    orfids_tmp = os.system('mkdir ' + os.path.join(outdir, 'pullseq_tmp/orfids_by_genome'))
+    genome_tmp = os.path.join(outdir, 'pullseq_tmp/genome_fastas')
+    os.system('mkdir ' + genome_tmp)
+    orfids_tmp = os.path.join(outdir, 'pullseq_tmp/orfids_by_genome')
+    os.system('mkdir ' + orfids_tmp)
+
 
     recs_by_file = []
     recs_by_hmm = []
