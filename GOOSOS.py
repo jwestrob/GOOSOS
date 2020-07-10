@@ -225,7 +225,7 @@ def extract_hits_3(all_df, threads, outdir):
                 outfile.writelines(str(element) + '\n')
 
         os.system('pullseq -i ' + os.path.join(genome_dir, protfile) + ' -n ' + os.path.join(orfids_tmp, genome_id + '.txt > ' + genome_tmp + '/' + genome_id + 'allhits.faa'))
-        genome_recs = list(SeqIO.parse(os.path.join(genome_tmp, 'allhits.faa'), 'fasta'))
+        genome_recs = list(SeqIO.parse(os.path.join(genome_tmp, genome_id + 'allhits.faa'), 'fasta'))
         return genome_recs
 
     p2 = Pool(threads)
