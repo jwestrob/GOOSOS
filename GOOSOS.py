@@ -257,7 +257,7 @@ def extract_hits_4(all_df, threads, protdir, outdir):
 
 
     def grab_recs_by_hmm(hmm, protdir=protdir, orfids_tmp=orfids_tmp, all_df=all_df):
-        hits_fasta = os.path.join(outdir + 'proteins/',  hmm + '_hits.faa')
+        hits_fasta = os.path.join(outdir + '/proteins',  hmm + '_hits.faa')
         #Create/overwrite existing fasta file for hits
         os.system('>' + hits_fasta)
         idfile = os.path.join(orfids_tmp, hmm + '.txt')
