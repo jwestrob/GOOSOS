@@ -267,7 +267,7 @@ def extract_hits_4(all_df, threads, protdir, outdir):
 
         for genome in all_df.genome_id.unique().tolist():
 
-            genome_file = list(filter(lambda x: x.split('.fa')[0].split('.fna')[0] == genome, os.listdir(protdir)))
+            genome_file = list(filter(lambda x: x.split('.fa')[0].split('.fna')[0] == genome, os.listdir(protdir)))[0]
             genome_file = os.path.join(protdir, genome_file)
             pullseq_cmd = 'cat ' + idfile + ' | pullseq -i ' + genome_file + ' -N >> ' + hits_fasta
             os.system(pullseq_cmd)
