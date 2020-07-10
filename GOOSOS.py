@@ -238,12 +238,12 @@ def extract_hits_3(all_df, threads, outdir):
     all_recs = flatten(recs_by_file)
     print("Separating orfs...")
     #for hmm in all_df.family_hmm.unique().tolist():
-    def separate_orfs(family_hmm, all_df=all_df, all_recs=all_recs):
-        desired_orfs_2 = all_df[all_df.family_hmm == hmm].orf_id.tolist()
-        hmm_recs = list(filter(lambda x: x.id in desired_orfs_2, all_recs))
-        return([hmm_recs, hmm])
+    def separate_orfs(orflist, hmmname, all_df=all_df, all_recs=all_recs):
+        hmm_recs = list(filter(lambda x: x.id in orflist, all_recs))
+        return([hmm_recs, hmmname])
 
-    recs_by_hmm = list(p2.map(separate_orfs, all_df.family_hmm.tolist()))
+    #This is such a dope line of code. Swag
+    recs_by_hmm = list(p2.map(lambda hmm: separate_orfs(all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm), all_df.family_hmm.tolist()))
 
     return recs_by_hmm
 
