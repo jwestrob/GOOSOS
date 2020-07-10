@@ -263,7 +263,7 @@ def extract_hits_4(all_df, threads, protdir, outdir):
         idfile = os.path.join(orfids_tmp, hmm + '.txt')
         with open(idfile, 'w') as outfile:
             for orfid in all_df[all_df.family_hmm == hmm].orf_id.tolist():
-                outfile.write(orfid + '\n')
+                outfile.write(str(orfid) + '\n')
 
         for genome in all_df.genome_id.unique().tolist():
 
