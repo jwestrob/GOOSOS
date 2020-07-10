@@ -282,37 +282,6 @@ def extract_hits_4(all_df, threads, protdir, outdir):
 
     return rec_ids_by_hmm
 
-def make_hitstable_df(rec_ids_by_hmm, hmmlist, fastalist, outdir):
-
-    # Make matrix of zeros to store hits
-    print("Making hits matrix...")
-    hitstable = np.zeros((len(hmmlist), len(fastalist)))
-
-    hits = pd.DataFrame(hitstable).T
-    hits.columns = hmmlist
-
-    hits.index = fastalist
-
-    # Mark hits in table
-    for hmm_recs, hmm in rec_ids_by_hmm:
-
-        hmm_idx = hmmlist.index(hmm)
-
-        for genome_hit in hmm_recs:
-            #Extract genome ID from fasta header
-            try:
-                genome_id = genome_hit.split('|')[0]
-            except:
-                print(genome_id)
-                print(type(genome_id))
-
-            hits[hmm][genome_id] += 1
-
-
-    #Write it to tsv in outdir without index (annoying)
-    colnames = hits.columns.values.tolist()
-
-    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t')
 
 def write_recs(recs_for_hmm, hmm_name, outdir):
     fasta_outdir = outdir + '/fastas'
@@ -754,36 +723,6 @@ def main():
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
     if not no_seqs:
         rec_ids_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
-
-        make_hitstable_df(rec_ids_list_by_hmm, hmmlist, protlist, outdir)
-    else:
-        rec_ids_list_by_hmm = [[all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm] for hmm in all_df.family_hmm.unique()]
-        make_hitstable_df(rec_ids_list_by_hmm, hmmlist, protlist, outdir)
-
-    if not no_seqs:
-        #print("Getting recs and writing to fasta...")
-        """
-        hmms_written = list(map(lambda hits:
-                                        write_recs(
-                                        #Actual list of recs
-                                        hits[0],
-                                        #Name of HMM to write (for fasta name)
-                                        hits[1],
-                                        outdir),
-                                        #List of recs to iterate over
-                                        recs_list_by_hmm))
-        """
-        if align:
-            out_fastas = os.listdir(outdir + '/fastas')
-            out_fastas = list(map(lambda x: os.path.join(outdir + '/fastas', x), out_fastas))
-            os.system('mkdir ' + outdir + '/alignments')
-            list(map(lambda x: align_fn(x, outdir, threads, accurate), out_fastas))
-
-
-    #prot_series = pd.Series(protlist)
-    #prot_series.to_csv(outdir + '/genome_order.txt', sep=',', index=False, header=False)
-
-    #print("Order of sorted fastas written to genome_order.txt.")
 
     print("You did it!")
     sys.exit()
