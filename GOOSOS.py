@@ -236,10 +236,13 @@ def extract_hits_3(all_df, threads, outdir):
 
     all_recs = flatten(recs_by_file)
 
-    for hmm in all_df.family_hmm.unique().tolist():
+    #for hmm in all_df.family_hmm.unique().tolist():
+    def separate_orfs(family_hmm, all_df=all_df, all_recs=all_recs)
         desired_orfs_2 = all_df[all_df.family_hmm == hmm].orf_id.tolist()
         hmm_recs = list(filter(lambda x: x.id in desired_orfs_2, all_recs))
-        recs_by_hmm.append([hmm_recs, hmm])
+        return([hmm_recs, hmm])
+
+    recs_by_hmm = list(p2.map(separate_orfs, all_recs))
 
     return recs_by_hmm
 
