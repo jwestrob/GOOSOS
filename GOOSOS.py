@@ -252,12 +252,12 @@ def extract_hits_3(all_df, threads, outdir):
 def extract_hits_4(all_df, threads, protdir, outdir):
     orfids_tmp = os.path.join(outdir, 'pullseq_tmp')
     os.system('mkdir ' + orfids_tmp)
-
+    os.system('mkdir ' + os.path.join(outdir, 'fastas'))
     #Takes all_df and generates recs for each HMM by extracting with pullseq
 
 
     def grab_recs_by_hmm(hmm, protdir=protdir, orfids_tmp=orfids_tmp, all_df=all_df):
-        hits_fasta = os.path.join(outdir + '/proteins',  hmm + '_hits.faa')
+        hits_fasta = os.path.join(outdir + '/fastas',  hmm + '_hits.faa')
         #Create/overwrite existing fasta file for hits
         os.system('>' + hits_fasta)
         idfile = os.path.join(orfids_tmp, hmm + '.txt')
