@@ -229,13 +229,14 @@ def extract_hits_3(all_df, threads, outdir):
         return genome_recs
 
     p2 = Pool(threads)
+    print("Fetching orfs...")
     recs_by_file = list(p2.map(grab_recs_by_genome,  all_df.genome_id.unique().tolist()))
 
 
     flatten = lambda l: [item for sublist in l for item in sublist]
 
     all_recs = flatten(recs_by_file)
-
+    print("Separating orfs...")
     #for hmm in all_df.family_hmm.unique().tolist():
     def separate_orfs(family_hmm, all_df=all_df, all_recs=all_recs):
         desired_orfs_2 = all_df[all_df.family_hmm == hmm].orf_id.tolist()
