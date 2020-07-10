@@ -235,15 +235,50 @@ def extract_hits_3(all_df, threads, outdir):
 
     flatten = lambda l: [item for sublist in l for item in sublist]
 
-    all_recs = flatten(recs_by_file)
+    all_recs = pd.Series(flatten(recs_by_file))
     print("Separating orfs...")
-    #for hmm in all_df.family_hmm.unique().tolist():
     def separate_orfs(orflist, hmmname, all_df=all_df, all_recs=all_recs):
-        hmm_recs = list(filter(lambda x: x.id in orflist, all_recs))
+        #all_recs is pd.Series now
+        hmm_recs = all_recs[all_recs.apply(lambda x: x.id in orflist)]
         return([hmm_recs, hmmname])
 
     #This is such a dope line of code. Swag
-    recs_by_hmm = list(p2.map(lambda hmm: separate_orfs(all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm), all_df.family_hmm.tolist()))
+    recs_by_hmm = list(p2.map(
+                    lambda hmm: separate_orfs(all_df[all_df.family_hmm == hmm].orf_id.tolist(), hmm),
+                    all_df.family_hmm.tolist()))
+
+    return recs_by_hmm
+
+def extract_hits_4(all_df, threads, protdir, outdir):
+    orfids_tmp = os.path.join(outdir, 'pullseq_tmp')
+    os.system('mkdir ' + orfids_tmp)
+
+    #Takes all_df and generates recs for each HMM by extracting with pullseq
+
+
+    def grab_recs_by_hmm(hmm, protdir=protdir, orfids_tmp=orfids_tmp, all_df=all_df):
+        hits_fasta = os.path.join(outdir + 'proteins/',  hmm + '_hits.faa')
+        #Create/overwrite existing fasta file for hits
+        os.system('>' + hits_fasta)
+        idfile = os.path.join(orfids_tmp, hmm + '.txt')
+        with open(idfile, 'w') as outfile:
+            for orfid in all_df[all_df.family_hmm == hmm].orf_id.tolist():
+                outfile.write(orfid + '\n')
+
+        for genome in all_df.genome_id.unique().tolist():
+
+            genome_file = list(filter(lambda x: x.split('.fa')[0].split('.fna')[0] == genome, os.listdir(protdir)))
+            genome_file = os.path.join(protdir, genome_file)
+            pullseq_cmd = 'cat ' + idfile + ' | pullseq -i ' + genome_file + ' -N >> ' + hits_fasta
+            os.system(pullseq_cmd)
+
+        return [list(SeqIO.parse(hits_fasta, 'fasta')), hmm]
+
+    p2 = Pool(threads)
+    print("Fetching orfs...")
+    recs_by_file = list(p2.map(grab_recs_by_hmm,  all_df.family_hmm.unique().tolist()))
+    os.system('rm -rf ' + orfids_tmp)
+
 
     return recs_by_hmm
 
@@ -717,7 +752,7 @@ def main():
 
 
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
-    recs_list_by_hmm = extract_hits_3(all_df, threads, outdir)
+    recs_list_by_hmm = extract_hits_4(all_df, threads, outdir)
     #Make directory to store fasta hits
     if not os.path.exists(outdir + '/' + 'fastas'):
         os.system('mkdir ' + outdir + '/' + 'fastas')
