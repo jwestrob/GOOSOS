@@ -222,7 +222,7 @@ def extract_hits_3(all_df, threads, outdir):
 
         with open(os.path.join(orfids_tmp, genome_id + '.txt'), 'w') as outfile:
             for element in desired_orfs:
-                outfile.writelines(element + '\n')
+                outfile.writelines(str(element) + '\n')
 
         os.system('pullseq -i ' + os.path.join(genome_dir, protfile) + ' -n ' + os.path.join(orfids_tmp, genome_id + '.txt > ' + genome_tmp + '/' + genome_id + 'allhits.faa'))
         genome_recs = list(SeqIO.parse(os.path.join(genome_tmp, 'allhits.faa'), 'fasta'))
