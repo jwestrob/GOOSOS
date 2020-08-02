@@ -588,6 +588,38 @@ def mark_with_threshold(all_df, hmm_thresh_dict):
 
     return all_df
 
+def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
+
+    # Make matrix of zeros to store hits
+    print("Making hits matrix...")
+    hitstable = np.zeros((len(hmmlist), len(fastalist)))
+
+    hits = pd.DataFrame(hitstable).T
+    hits.columns = hmmlist
+
+    hits.index = fastalist
+
+    # Mark hits in table
+    for hmm_recs, hmm in recs_by_hmm:
+
+        hmm_idx = hmmlist.index(hmm)
+
+        for genome_hit in hmm_recs:
+            #Extract genome ID from fasta header
+            try:
+                genome_id = genome_hit.id.split('|')[0]
+            except:
+                print(genome_id)
+                print(type(genome_id))
+
+            hits[hmm][genome_id] += 1
+
+
+    #Write it to tsv in outdir without index (annoying)
+    colnames = hits.columns.values.tolist()
+
+    hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t')
+
 def main():
     args = parser.parse_args()
     if args.nucdir is not None:
@@ -721,9 +753,12 @@ def main():
 
 
     #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
+
     if not no_seqs:
         rec_ids_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
-
+        make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
+    else:
+        print("no_seqs specified; HITSTABLE.tsv not created.")
     print("You did it!")
     sys.exit()
 
