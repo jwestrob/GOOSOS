@@ -120,7 +120,7 @@ def run_hmmsearch(protfile, outdir, threshold, best, cut_nc, cut_ga):
         sys.exit()
     #print(result)
     #Parse file with awk/perl nonsense; generate .parse file
-    parse_hmmdomtbl_multidomain(outdir, genome_id + '_hmmsearch.out', threshold)
+    #parse_hmmdomtbl_multidomain(outdir, genome_id + '_hmmsearch.out', threshold)
     return parse_hmmdomtbl(outdir, genome_id + '_hmmsearch.out', threshold, best)
 
 def get_rec_for_hit(genome_id, orf, outdir):
