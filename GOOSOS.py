@@ -562,8 +562,8 @@ def fetch_outfiles(outdir, threshold, threads, best):
 
     parsed_hmm_outfiles = list(p.map(lambda outfile: parse_hmmdomtbl(outdir, outfile, threshold, best),
                                      hmmoutfiles))
-    parsed_hmm_outfiles_multidomain = list(p.map(lambda outfile: parse_hmmdomtbl_multidomain(outdir, outfile, threshold),
-                                     hmmoutfiles))
+    #parsed_hmm_outfiles_multidomain = list(p.map(lambda outfile: parse_hmmdomtbl_multidomain(outdir, outfile, threshold),
+    #                                 hmmoutfiles))
     return parsed_hmm_outfiles
 
 
