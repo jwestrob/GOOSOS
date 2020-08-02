@@ -607,7 +607,7 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
         for genome_hit in hmm_recs:
             #Extract genome ID from fasta header
             try:
-                genome_id = genome_hit.id.split('|')[0]
+                genome_id = genome_hit.split('|')[0]
             except:
                 print(genome_id)
                 print(type(genome_id))
@@ -756,10 +756,11 @@ def main():
 
     if not no_seqs:
         rec_ids_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
-        make_hitstable_df(recs_list_by_hmm, hmmlist, protlist, outdir)
+        make_hitstable_df(rec_ids_list_by_hmm, hmmlist, protlist, outdir)
     else:
         print("no_seqs specified; HITSTABLE.tsv not created.")
     print("You did it!")
+    os.system('rm -rf ' + os.path.join(outdir, 'pullseq_tmp'))
     sys.exit()
 
 if __name__ == "__main__":
