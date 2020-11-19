@@ -620,6 +620,108 @@ def make_hitstable_df(recs_by_hmm, hmmlist, fastalist, outdir):
 
     hits.to_csv(outdir + '/HITSTABLE.tsv', sep='\t')
 
+def format_headers(protdir, outdir, threads):
+    #Make folder for labeled protein files
+    labeled_proteins = os.path.abspath(os.path.join(outdir, 'labeled_proteins'))
+    os.system('mkdir ' + labeled_proteins)
+
+    def labeler(fastafile):
+        new_recs = []
+        genome_id = fastafile.split('.fa')[0].split('.fna')[0]
+        for rec in SeqIO.parse(fastafile, 'fasta'):
+                #Assume labeling has already been done; return
+                if rec.id.split('|')[0] == genome_id:
+                        SeqIO.write(SeqIO.parse(fastafile, 'fasta'), os.path.join(labeled_proteins, fastafile))
+                        return
+                new_rec = rec
+                new_rec.id = genome_id + '|' + rec.id
+                new_recs.append(new_rec)
+        SeqIO.write(new_recs, fastafile, 'fasta')
+        return
+
+    p = Pool(threads)
+    protfiles_wpath = [os.path.join(protdir, x) for x in os.listdir(protdir)]
+    label = list(p.map(labeler, protfiles_wpath))
+    return labeled_proteins
+
+def ensure_synteny(all_hits, outdir, threads):
+    genome_ids = all_hits.genome_id.unique()
+    genome_abundances = all_hits.genome_id.value_counts()
+    all_hits['orfnum'] = all_hits.orf_id.apply(lambda x: int(x.split('_')[-1]))
+
+    #Find genomes with >=8 RP hits
+    abundances_past_threshold = genome_abundances[(genome_abundances >= 8.0)]
+    all_hits_thresh = all_hits[all_hits.genome_id.isin(abundances_past_threshold.index.tolist())]
+
+    #Get scaffold IDs
+    all_hits_thresh['scaffold_id'] = all_hits_thresh.orf_id.apply(lambda x: '_'.join(x.split('_')[0:-1]))
+
+    good_ids = pd.Series(all_hits_thresh.genome_id.unique().tolist())
+
+    #How many scaffolds are there with ribosomal hits in each genome?
+    num_scaffolds = []
+    for good_id in good_ids.tolist():
+        num_scaffolds_id = len(all_hits_thresh[all_hits_thresh.genome_id == good_id].scaffold_id.unique())
+        num_scaffolds.append(num_scaffolds_id)
+
+    #Get a dataframe with genome_id, number_of_scaffolds_with_RPs
+    scaf_series = pd.Series(num_scaffolds)
+    scaf_df = pd.concat([g￼ood_ids, scaf_series], axis=1)
+    scaf_df.columns = ['genome_id', 'num_scaffolds']
+    scaf_df['num_hits'] = scaf_df.genome_id.apply(lambda x: abundances_past_threshold[x])
+
+    okay_genomes = scaf_df[scaf_df.num_scaffolds == 1].genome_id.tolist()
+
+    questionable_genomes = scaf_df[scaf_df.num_scaffolds > 1]
+
+    questionable_genome_ids = questionable_genomes.genome_id.tolist()
+
+    scaf_counts_df = pd.DataFrame(columns=['scaffold_id', 'scaffold_count', 'genome_id'])
+
+    for questionable_genome in questionable_genome_ids:
+        #Get reduced DF for that genome
+        red_df = all_hits_thresh[all_hits_thresh.genome_id == questionable_genome]
+        #How many hits are on each scaffold?
+        candidate_scaffold_counts = red_df.scaffold_id.value_counts()
+
+        #Make a DF to access that data- how many RPs on each scaffold?
+        cur_scaf_df = pd.concat([pd.Series(candidate_scaffold_counts.index.tolist()), pd.Series(candidate_scaffold_counts.values)], axis=1)
+        cur_scaf_df.columns = ['scaffold_id', 'scaffold_count']
+
+        #weird way of just making column of genome_id
+        cur_scaf_df['genome_id'] = cur_scaf_df['scaffold_id'].apply(lambda x: questionable_genome)
+        scaf_counts_df = pd.concat([scaf_counts_df, cur_scaf_df])
+
+    reduced_scaffolds = pd.DataFrame(columns=['scaffold_id', 'scaffold_count', 'genome_id'])
+
+    for genome in scaf_counts_df.genome_id.unique():
+        red_df = scaf_counts_df[scaf_counts_df.genome_id == genome]
+        red_df = red_df.sort_values(by='scaffold_count', ascending=False)
+        reduced_scaffolds = reduced_scaffolds.append(red_df.iloc[0])
+
+    reduced_scaffolds = reduced_scaffolds[reduced_scaffolds.scaffold_count >= 8]
+
+    okay_scaffolds = scaf_df[(scaf_df.genome_id.isin(okay_genomes)) & (~scaf_df.genome_id.str.contains('yelton'))]
+
+    all_good_hits = all_hits[all_hits.genome_id.isin(okay_genomes)]
+
+    #Now for the more complicated part - getting the right scaffold from the other genomes
+
+    chosen_hits = all_hits[all_hits.genome_id.isin(reduced_scaffolds.genome_id.unique())]
+
+    chosen_hits['scaffold_id'] = chosen_hits.orf_id.apply(lambda x: '_'.join(x.split('_')[0:-1]))
+    chosen_hits['orfnum'] = chosen_hits.orf_id.apply(lambda x: x.split('_')[-1])
+    chosen_hits = chosen_hits[chosen_hits.scaffold_id.isin(reduced_scaffolds.scaffold_id)]
+
+
+
+    all_good_hits = all_good_hits.append(chosen_hits.drop(['scaffold_id', 'orfnum'], axis=1))
+
+    #Write to all_hits_evalues_df for Concatenate_And_Align.py
+    all_good_hits.to_csv(os.path.join(outdir, 'all_hits_evalues_df.tsv'), sep='\t', index=False)
+
+    return
+
 def main():
     args = parser.parse_args()
     if args.nucdir is not None:
@@ -634,6 +736,7 @@ def main():
     if nucdir is None and prodigaldir is None:
         print("You need to provide a protein or nucleotide directory.")
         sys.exit(420)
+
     hmmdir = str(Path(args.hmmdir).absolute())
     outdir = str(args.outdir)
     threshold = float(args.evalue)
@@ -646,9 +749,12 @@ def main():
     accurate = args.accurate
     cut_nc = args.cut_nc
     cut_ga = args.cut_ga
+    ribosomal_synteny = args.synteny
 
 
     have_proteins = True if prodigaldir is not None else False
+    if have_proteins:
+        prodigaldir = format_headers(prodigaldir, outdir, threads)
 
     p = Pool(threads)
 
@@ -697,7 +803,7 @@ def main():
         if not have_proteins:
             protdir = outdir + '/proteins'
         else:
-            protdir = prodigaldir
+            protdir = os.path.abspath(prodigaldir)
 
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
@@ -751,8 +857,10 @@ def main():
 
         all_df = pd.read_csv(outdir + '/all_hits_evalues_df.tsv', sep='\t')
 
+    #Ensure 16RP synteny
+    if ribosomal_synteny:
+        ensure_synteny(all_df, outdir, threads)
 
-    #recs_list_by_hmm = extract_hits(all_df, threads, outdir)
 
     if not no_seqs:
         rec_ids_list_by_hmm = extract_hits_4(all_df, threads, protdir, outdir)
