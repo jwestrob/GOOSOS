@@ -28,6 +28,7 @@ parser.add_argument('-align', default=False, action='store_true', help='Align fa
 parser.add_argument('-accurate', default=False, action='store_true', help='If aligning, use accurate (SLOW) mafft parameters.')
 parser.add_argument('-cut_nc', default=False, action='store_true', help='If using KEGG HMMs, use the --cut_nc option during hmmsearch (built in cutoffs)')
 parser.add_argument('-cut_ga', default=False, action='store_true', help='If using PFAM HMMs, use the --cut_ga option during hmmsearch (built in cutoffs)')
+parser.add_argument('-synteny', default=False, action='store_true', help='If doing RP16, ensure syntenic blocks (>=8 hits on single contigs per genome)')
 
 #------------------------
 #      FUNCTION ZOO
@@ -624,24 +625,34 @@ def format_headers(protdir, outdir, threads):
     #Make folder for labeled protein files
     labeled_proteins = os.path.abspath(os.path.join(outdir, 'labeled_proteins'))
     os.system('mkdir ' + labeled_proteins)
-
+    print("Protdir: ", protdir)
+    print("Labeled proteins dir: ", labeled_proteins)
     def labeler(fastafile):
         new_recs = []
-        genome_id = fastafile.split('.fa')[0].split('.fna')[0]
+        genome_id = fastafile.split('/')[-1].split('.fa')[0].split('.fna')[0]
         for rec in SeqIO.parse(fastafile, 'fasta'):
                 #Assume labeling has already been done; return
                 if rec.id.split('|')[0] == genome_id:
-                        SeqIO.write(SeqIO.parse(fastafile, 'fasta'), os.path.join(labeled_proteins, fastafile))
+                        SeqIO.write(SeqIO.parse(fastafile, 'fasta'), os.path.join(labeled_proteins, fastafile.split('/')[-1]), 'fasta')
                         return
                 new_rec = rec
                 new_rec.id = genome_id + '|' + rec.id
                 new_recs.append(new_rec)
-        SeqIO.write(new_recs, fastafile, 'fasta')
+        SeqIO.write(new_recs, os.path.join(labeled_proteins, fastafile.split('/')[-1]), 'fasta')
         return
 
     p = Pool(threads)
     protfiles_wpath = [os.path.join(protdir, x) for x in os.listdir(protdir)]
-    label = list(p.map(labeler, protfiles_wpath))
+    #print("TEST RUN:")
+    #print("Protein file:", protfiles_wpath[0])
+    #labeler(protfiles_wpath[0])
+    #sys.exit()
+    def is_fasta(filename):
+        if filename.endswith('.fasta') or filename.endswith('.faa') or filename.endswith('.fa') or filename.endswith('.fasta') or filename.endswith('.fna'):
+            return True
+        else:
+            return False
+    label = list(p.map(labeler, filter(is_fasta, protfiles_wpath)))
     return labeled_proteins
 
 def ensure_synteny(all_hits, outdir, threads):
@@ -666,7 +677,7 @@ def ensure_synteny(all_hits, outdir, threads):
 
     #Get a dataframe with genome_id, number_of_scaffolds_with_RPs
     scaf_series = pd.Series(num_scaffolds)
-    scaf_df = pd.concat([g￼ood_ids, scaf_series], axis=1)
+    scaf_df = pd.concat([good_ids, scaf_series], axis=1)
     scaf_df.columns = ['genome_id', 'num_scaffolds']
     scaf_df['num_hits'] = scaf_df.genome_id.apply(lambda x: abundances_past_threshold[x])
 
@@ -699,7 +710,7 @@ def ensure_synteny(all_hits, outdir, threads):
         red_df = red_df.sort_values(by='scaffold_count', ascending=False)
         reduced_scaffolds = reduced_scaffolds.append(red_df.iloc[0])
 
-    reduced_scaffolds = reduced_scaffolds[reduced_scaffolds.scaffold_count >= 8]
+    reduced_scaffolds = reduced_scaffolds[reduced_scaffolds.scaffold_count >= 7]
 
     okay_scaffolds = scaf_df[(scaf_df.genome_id.isin(okay_genomes)) & (~scaf_df.genome_id.str.contains('yelton'))]
 
@@ -710,7 +721,7 @@ def ensure_synteny(all_hits, outdir, threads):
     chosen_hits = all_hits[all_hits.genome_id.isin(reduced_scaffolds.genome_id.unique())]
 
     chosen_hits['scaffold_id'] = chosen_hits.orf_id.apply(lambda x: '_'.join(x.split('_')[0:-1]))
-    chosen_hits['orfnum'] = chosen_hits.orf_id.apply(lambda x: x.split('_')[-1])
+    chosen_hits['orfnum'] = chosen_hits.orf_id.apply(lambda x: x.split('_')[-1]).copy()
     chosen_hits = chosen_hits[chosen_hits.scaffold_id.isin(reduced_scaffolds.scaffold_id)]
 
 
@@ -751,19 +762,19 @@ def main():
     cut_ga = args.cut_ga
     ribosomal_synteny = args.synteny
 
+    #Make output directory
+    if not os.path.exists(outdir):
+        os.system('mkdir ' + outdir)
+        outdir = str(Path(outdir).absolute())
+    else:
+        outdir = str(Path(outdir).absolute())
+
 
     have_proteins = True if prodigaldir is not None else False
     if have_proteins:
         prodigaldir = format_headers(prodigaldir, outdir, threads)
 
     p = Pool(threads)
-
-    # Make output directory
-    if not os.path.exists(outdir):
-        os.system('mkdir ' + outdir)
-        outdir = str(Path(outdir).absolute())
-    else:
-        outdir = str(Path(outdir).absolute())
 
     if not have_proteins:
         # Get list of paths of all fastas
@@ -798,12 +809,14 @@ def main():
 
             #Predict genes for nucleotide fastas
             p.map(lambda x: run_prodigal(x, outdir), fastalist_wpath)
+            format_headers(os.path.join(outdir, 'proteins'), outdir, threads)
 
 
         if not have_proteins:
             protdir = outdir + '/proteins'
         else:
             protdir = os.path.abspath(prodigaldir)
+            #format_headers(protdir, outdir, threads)
 
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
 
@@ -822,6 +835,8 @@ def main():
 
         all_df_list = list(p.map(lambda x: pd.read_csv(x, sep='\t'), parsed_hmm_outfiles))
         all_df_init = pd.concat(all_df_list, sort=False)
+        #print(all_df_init.orf_id.head())
+        #sys.exit()
         if hmm_thresh_dict is not None:
             all_df_thresh = mark_with_threshold(all_df_init, hmm_thresh_dict)
             all_df = all_df_thresh[all_df_thresh['above_threshold']]
