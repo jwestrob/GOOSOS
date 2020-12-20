@@ -884,6 +884,7 @@ def main():
         print("no_seqs specified; HITSTABLE.tsv not created.")
     print("You did it!")
     os.system('rm -rf ' + os.path.join(outdir, 'pullseq_tmp'))
+    p.terminate()
     sys.exit()
 
 if __name__ == "__main__":
