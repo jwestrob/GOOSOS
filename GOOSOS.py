@@ -1,7 +1,7 @@
 from pathos.multiprocessing import ProcessingPool as Pool
 from Bio.SeqRecord import SeqRecord
 from Bio import SeqIO
-from Bio.Alphabet import IUPAC
+#from Bio.Alphabet import IUPAC
 import os, sys, pandas as pd
 from pathlib import Path
 from Bio.Seq import Seq
@@ -813,7 +813,7 @@ def main():
 
 
         if not have_proteins:
-            protdir = outdir + '/proteins'
+            protdir = outdir + '/labeled_proteins'
         else:
             protdir = os.path.abspath(prodigaldir)
             #format_headers(protdir, outdir, threads)
