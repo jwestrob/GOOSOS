@@ -821,7 +821,7 @@ def main():
             #format_headers(protdir, outdir, threads)
 
         protlist_wpath = list(map(lambda file: os.path.join(protdir, file), os.listdir(protdir)))
-
+        protlist_wpath = list(filter(lambda file: file.endswith('.faa') or file.endswith('.fa') or file.endswith('.fasta'), protlist_wpath))
         #Get list of protein files without full path
         protlist = list(map(lambda path: path.split('/')[-1].split('.fna')[0].split('.fa')[0].split('.fasta')[0],
                         protlist_wpath))
