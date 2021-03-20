@@ -779,6 +779,8 @@ def main():
     if not have_proteins:
         # Get list of paths of all fastas
         fastalist_wpath = list(map(lambda file: os.path.join(nucdir, file), os.listdir(nucdir)))
+        #mutation because i'm lazy; probably will bite me in teh ass
+        fastalist_wpath = list(filter(lambda x: x.endswith('.fna') or x.endswith('.fasta') or x.endswith('.fa'), fastalist_wpath))
 
     # Get list of all fastas
     #fastalist = list(map(lambda file: file.split('.f')[0], os.listdir(fastadir)))
